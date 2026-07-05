@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. GreenFix – Garden Consulting | Melbourne</title>
+<meta name="description" content="Expert online garden consulting in Melbourne. Photo diagnosis from $20, video consults, and in-person garden visits. Fix your garden problems fast.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --forest: #1B4332; --forest-mid: #2D6A4F; --sage: #52796F;
+  --sage-light: #84A98C; --gold: #E9C46A; --gold-dark: #C9A84C;
+  --cream: #F8F3E8; --cream-dark: #EFE9D8; --charcoal: #1E1E1E;
+  --mid: #555; --white: #FFFFFF;
+}
+html { scroll-behavior: smooth; }
+body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--charcoal); line-height:1.6; overflow-x:hidden; }
+
+/* ── LOADER ── */
+#loader {
+  position:fixed; inset:0; z-index:9999; background:var(--forest);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;
+  transition:opacity 0.6s, visibility 0.6s;
+}
+#loader.hidden { opacity:0; visibility:hidden; }
+.loader-logo { font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:#fff; }
+.loader-logo span { color:var(--gold); }
+.loader-bar { width:160px; height:3px; background:rgba(255,255,255,0.15); border-radius:2px; overflow:hidden; }
+.loader-fill { height:100%; background:var(--gold); border-radius:2px; animation:loadfill 1.2s ease forwards; }
+@keyframes loadfill { from{width:0} to{width:100%} }
+.loader-text { font-size:0.78rem; color:rgba(255,255,255,0.4); letter-spacing:0.1em; text-transform:uppercase; }
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:rgba(27,67,50,0.97); backdrop-filter:blur(14px);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 6%; height:68px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  transition:height 0.3s, box-shadow 0.3s;
+}
+nav.scrolled { height:58px; box-shadow:0 4px 24px rgba(0,0,0,0.3); }
+.nav-brand { font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#fff; text-decoration:none; display:flex; align-items:center; gap:0.5rem; }
+.nav-brand span { color:var(--gold); }
+.nav-links { display:flex; gap:2rem; list-style:none; align-items:center; }
+.nav-links a { color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.85rem; font-weight:500; letter-spacing:0.03em; transition:color 0.2s; position:relative; padding-bottom:2px; }
+.nav-links a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1.5px; background:var(--gold); transition:width 0.25s; }
+.nav-links a:hover { color:#fff; }
+.nav-links a:hover::after, .nav-links a.active::after { width:100%; }
+.nav-links a.active { color:#fff; }
+.nav-cta { background:var(--gold) !important; color:var(--forest) !important; padding:0.45rem 1.25rem; border-radius:3px; font-weight:700 !important; }
+.nav-cta:hover { background:var(--gold-dark) !important; }
+.nav-cta::after { display:none !important; }
+
+/* Hamburger */
+.hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+.hamburger span { display:block; width:24px; height:2px; background:#fff; border-radius:2px; transition:all 0.3s; }
+.hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+
+/* Mobile menu */
+.mobile-menu {
+  position:fixed; top:68px; left:0; right:0; z-index:190;
+  background:rgba(27,67,50,0.98); backdrop-filter:blur(14px);
+  padding:1.5rem 6%; display:flex; flex-direction:column; gap:1rem;
+  transform:translateY(-120%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.mobile-menu.open { transform:translateY(0); }
+.mobile-menu a { color:rgba(255,255,255,0.8); text-decoration:none; font-size:1rem; font-weight:500; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+.mobile-menu a:last-child { border:none; }
+.mobile-menu .mob-cta { background:var(--gold); color:var(--forest); font-weight:700; padding:0.75rem 1rem; border-radius:3px; text-align:center; border:none; margin-top:0.5rem; }
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal { opacity:0; transform:translateY(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-left { opacity:0; transform:translateX(-32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal-left.visible { opacity:1; transform:translateX(0); }
+.reveal-right { opacity:0; transform:translateX(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal-right.visible { opacity:1; transform:translateX(0); }
+.reveal-delay-1 { transition-delay:0.1s; }
+.reveal-delay-2 { transition-delay:0.2s; }
+.reveal-delay-3 { transition-delay:0.3s; }
+.reveal-delay-4 { transition-delay:0.4s; }
+
+/* ── HERO ── */
+.hero {
+  min-height:100vh;
+  background:linear-gradient(135deg, #0a1f15 0%, #1B4332 55%, #2D6A4F 100%);
+  display:grid; grid-template-columns:1fr 1fr;
+  align-items:center; padding:100px 6% 70px; gap:4rem;
+  position:relative; overflow:hidden;
+}
+.hero-bg-pattern { position:absolute; inset:0; pointer-events:none; opacity:0.035; background-image:radial-gradient(circle,#fff 1px,transparent 1px); background-size:36px 36px; }
+.hero-glow { position:absolute; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle,rgba(82,121,111,0.35) 0%,transparent 70%); top:50%; right:-100px; transform:translateY(-50%); pointer-events:none; }
+.hero-leaf { position:absolute; font-size:22rem; opacity:0.025; bottom:-4rem; left:-3rem; pointer-events:none; line-height:1; user-select:none; }
+.hero-text { position:relative; z-index:2; }
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  background:rgba(233,196,106,0.1); border:1px solid rgba(233,196,106,0.3);
+  color:var(--gold); font-size:0.72rem; font-weight:600; letter-spacing:0.13em;
+  text-transform:uppercase; padding:0.4rem 1rem; border-radius:2px; margin-bottom:1.75rem;
+  animation:fadeSlideDown 0.8s ease 1.4s both;
+}
+@keyframes fadeSlideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+.hero-title { font-family:'Playfair Display',serif; font-size:clamp(2.4rem,4.5vw,3.8rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:1.5rem; animation:fadeSlideUp 0.9s ease 1.5s both; }
+.hero-title em { font-style:italic; color:var(--gold); }
+@keyframes fadeSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.hero-subtitle { color:rgba(255,255,255,0.65); font-size:1.05rem; font-weight:300; max-width:480px; margin-bottom:2.5rem; line-height:1.75; animation:fadeSlideUp 0.9s ease 1.65s both; }
+.hero-actions { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:3rem; animation:fadeSlideUp 0.9s ease 1.8s both; }
+.btn-gold { background:var(--gold); color:var(--forest); padding:0.9rem 2rem; font-size:0.88rem; font-weight:700; text-decoration:none; border-radius:3px; letter-spacing:0.04em; text-transform:uppercase; border:none; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s, background 0.15s; display:inline-block; }
+.btn-gold:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(233,196,106,0.45); background:var(--gold-dark); }
+.btn-ghost { background:transparent; color:rgba(255,255,255,0.85); padding:0.9rem 2rem; font-size:0.88rem; font-weight:500; text-decoration:none; border-radius:3px; letter-spacing:0.04em; border:1.5px solid rgba(255,255,255,0.3); cursor:pointer; transition:all 0.2s; display:inline-block; }
+.btn-ghost:hover { border-color:rgba(255,255,255,0.7); color:#fff; }
+.hero-stats { display:flex; gap:2.5rem; flex-wrap:wrap; animation:fadeSlideUp 0.9s ease 1.95s both; }
+.stat-num { font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--gold); line-height:1; }
+.stat-label { font-size:0.75rem; color:rgba(255,255,255,0.5); font-weight:400; letter-spacing:0.04em; margin-top:0.2rem; }
+.hero-image { position:relative; z-index:2; display:flex; justify-content:center; align-items:center; animation:fadeSlideUp 1s ease 1.6s both; }
+.hero-image img { width:420px; height:420px; object-fit:contain; background:#fff; border-radius:50%; border:5px solid rgba(233,196,106,0.5); box-shadow:0 30px 60px rgba(0,0,0,0.5), 0 0 0 14px rgba(233,196,106,0.1); }
+.hero-image::before {
+  content:''; position:absolute; width:460px; height:460px; border-radius:50%;
+  border:1.5px dashed rgba(233,196,106,0.2); animation:spin 30s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── TRUST BAR ── */
+.trust-bar { background:var(--forest); padding:1.1rem 6%; display:flex; align-items:center; justify-content:center; gap:3rem; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,0.07); }
+.trust-item { display:flex; align-items:center; gap:0.55rem; color:rgba(255,255,255,0.6); font-size:0.8rem; font-weight:500; letter-spacing:0.04em; }
+.trust-icon { font-size:0.95rem; }
+
+/* ── SECTION COMMONS ── */
+.section-header { text-align:center; margin-bottom:4rem; }
+.eyebrow { display:inline-block; color:var(--sage); font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.9rem; }
+.eyebrow-gold { color:var(--gold); }
+.section-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:700; color:var(--forest); line-height:1.2; }
+.section-title-light { color:#fff; }
+.section-desc { color:var(--sage); font-size:1rem; max-width:500px; margin:0.9rem auto 0; font-weight:300; }
+.section-desc-light { color:rgba(255,255,255,0.55); }
+
+/* ── SERVICES ── */
+.services { padding:100px 6%; background:var(--cream); }
+.services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; max-width:1140px; margin:0 auto; }
+.service-card { background:#fff; border-radius:8px; overflow:hidden; border:1.5px solid rgba(82,121,111,0.15); transition:transform 0.3s, box-shadow 0.3s, border-color 0.3s; position:relative; }
+.service-card:hover { transform:translateY(-8px); box-shadow:0 28px 60px rgba(27,67,50,0.15); border-color:rgba(27,67,50,0.2); }
+.service-card:hover .card-btn { background:var(--forest-mid); }
+.card-top { background:var(--forest); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.card-top-label { font-family:'Playfair Display',serif; font-style:italic; font-size:0.83rem; color:rgba(255,255,255,0.4); }
+.card-badge { background:var(--gold); color:var(--forest); font-size:0.68rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:0.22rem 0.65rem; border-radius:2px; }
+.card-body { padding:1.75rem; }
+.card-price { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:900; color:var(--forest); line-height:1; }
+.card-price sup { font-size:1.1rem; vertical-align:top; margin-top:0.5rem; }
+.card-price-suffix { font-size:1rem; color:var(--sage); font-weight:400; font-family:'Inter',sans-serif; }
+.card-title { font-size:1.2rem; font-weight:700; color:var(--charcoal); margin:0.75rem 0 0.4rem; }
+.card-desc { color:var(--sage); font-size:0.875rem; line-height:1.6; margin-bottom:1.5rem; font-weight:300; }
+.card-features { list-style:none; display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.75rem; }
+.card-features li { display:flex; align-items:flex-start; gap:0.65rem; font-size:0.85rem; color:#444; line-height:1.4; }
+.card-features li::before { content:'✓'; color:var(--sage); font-weight:700; flex-shrink:0; margin-top:0.05rem; }
+.card-btn { display:block; text-align:center; background:var(--forest); color:#fff; text-decoration:none; padding:0.85rem; font-size:0.83rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; border-radius:3px; transition:background 0.2s; cursor:pointer; border:none; width:100%; }
+.card-featured { border:2px solid var(--gold); }
+.card-featured .card-top { background:var(--forest-mid); }
+.card-featured .card-btn { background:var(--gold); color:var(--forest); }
+.card-featured .card-btn:hover, .card-featured:hover .card-btn { background:var(--gold-dark) !important; }
+.popular-ribbon { position:absolute; top:0; right:0; background:var(--gold); color:var(--forest); font-size:0.65rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:0.3rem 0.8rem; border-radius:0 8px 0 6px; }
+
+/* ── GALLERY ── */
+.gallery { padding:100px 6% 110px; background:#fff; }
+.gallery-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.25rem; max-width:1140px; margin:0 auto; }
+.gallery-item { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:4/3; box-shadow:0 4px 20px rgba(27,67,50,0.08); }
+.gallery-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease; }
+.gallery-item:hover img { transform:scale(1.08); }
+.gallery-cap { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(to top,rgba(10,25,18,0.85),transparent); color:#fff; font-size:0.8rem; font-weight:600; padding:1.75rem 1rem 0.75rem; }
+
+/* ── HOW IT WORKS ── */
+.how { background:var(--forest); padding:100px 6%; }
+.steps { display:grid; grid-template-columns:repeat(3,1fr); gap:0; max-width:900px; margin:0 auto; position:relative; }
+.steps::before { content:''; position:absolute; top:28px; left:calc(16.6% + 28px); right:calc(16.6% + 28px); height:2px; background:rgba(233,196,106,0.2); }
+.step { text-align:center; padding:2rem 1.5rem; position:relative; }
+.step-icon { width:56px; height:56px; border-radius:50%; background:var(--gold); color:var(--forest); font-family:'Playfair Display',serif; font-weight:900; font-size:1.4rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; position:relative; z-index:1; box-shadow:0 4px 16px rgba(233,196,106,0.4); }
+.step-title { font-weight:700; font-size:1rem; color:#fff; margin-bottom:0.6rem; }
+.step-desc { font-size:0.875rem; color:rgba(255,255,255,0.5); font-weight:300; line-height:1.65; }
+
+/* ── ABOUT ── */
+.about { background:var(--cream-dark); padding:100px 6%; }
+.about-inner { max-width:1140px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+.about-title { font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3vw,2.5rem); font-weight:700; color:var(--forest); line-height:1.2; margin-bottom:1.25rem; }
+.about-body { color:var(--mid); font-size:0.975rem; line-height:1.8; font-weight:300; margin-bottom:1.25rem; }
+.about-body strong { color:var(--forest); font-weight:600; }
+.problem-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.7rem; }
+.problem-pill { display:flex; align-items:center; gap:0.6rem; background:#fff; border:1.5px solid rgba(82,121,111,0.18); padding:0.7rem 1rem; border-radius:5px; font-size:0.83rem; font-weight:500; color:var(--charcoal); transition:all 0.2s; cursor:default; }
+.problem-pill:hover { border-color:var(--sage); background:rgba(82,121,111,0.06); transform:translateX(4px); }
+
+/* ── TESTIMONIALS ── */
+.testimonials { background:#fff; padding:100px 6%; }
+.testi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; max-width:1140px; margin:0 auto; }
+.testi-card { background:var(--cream); border-radius:8px; padding:2rem; border:1px solid rgba(82,121,111,0.1); transition:transform 0.25s, box-shadow 0.25s; position:relative; overflow:hidden; }
+.testi-card::before { content:'"'; position:absolute; top:-0.5rem; left:1rem; font-family:'Playfair Display',serif; font-size:6rem; color:rgba(27,67,50,0.06); line-height:1; pointer-events:none; }
+.testi-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(27,67,50,0.1); }
+.stars { color:var(--gold); font-size:0.9rem; letter-spacing:0.05em; margin-bottom:1rem; }
+.testi-text { font-size:0.93rem; color:#444; line-height:1.75; font-style:italic; margin-bottom:1.5rem; font-weight:300; position:relative; }
+.testi-author { display:flex; align-items:center; gap:0.75rem; }
+.testi-avatar { width:42px; height:42px; border-radius:50%; background:var(--forest); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.9rem; flex-shrink:0; }
+.testi-name { font-weight:700; font-size:0.875rem; color:var(--forest); }
+.testi-loc { font-size:0.78rem; color:var(--sage); }
+
+/* ── FAQ ── */
+.faq { background:var(--cream-dark); padding:100px 6%; }
+.faq-list { max-width:780px; margin:0 auto; display:flex; flex-direction:column; gap:0.75rem; }
+.faq-item { background:#fff; border-radius:6px; border:1px solid rgba(82,121,111,0.15); overflow:hidden; }
+.faq-q { width:100%; background:none; border:none; padding:1.25rem 1.5rem; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:1rem; font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:600; color:var(--forest); transition:background 0.2s; }
+.faq-q:hover { background:rgba(82,121,111,0.05); }
+.faq-icon { font-size:1.3rem; font-weight:300; color:var(--sage); transition:transform 0.3s; flex-shrink:0; line-height:1; }
+.faq-item.open .faq-icon { transform:rotate(45deg); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height 0.4s ease, padding 0.3s; }
+.faq-a-inner { padding:0 1.5rem 1.25rem; font-size:0.9rem; color:var(--mid); line-height:1.75; font-weight:300; border-top:1px solid rgba(82,121,111,0.1); padding-top:1rem; margin-top:0; }
+.faq-item.open .faq-a { max-height:300px; }
+
+/* ── CTA STRIP ── */
+.cta-strip { background:var(--gold); padding:90px 6%; text-align:center; position:relative; overflow:hidden; }
+.cta-strip::before { content:'🌿'; position:absolute; font-size:20rem; opacity:0.06; bottom:-5rem; right:-3rem; pointer-events:none; }
+.cta-strip h2 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,3rem); font-weight:900; color:var(--forest); line-height:1.15; margin-bottom:1rem; position:relative; }
+.cta-strip p { color:rgba(27,67,50,0.7); font-size:1rem; max-width:480px; margin:0 auto 2.5rem; font-weight:300; position:relative; }
+.cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; }
+.btn-forest { background:var(--forest); color:#fff; padding:0.9rem 2.2rem; font-size:0.88rem; font-weight:700; text-decoration:none; border-radius:3px; letter-spacing:0.04em; text-transform:uppercase; transition:transform 0.15s, box-shadow 0.15s; border:none; cursor:pointer; display:inline-block; }
+.btn-forest:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(27,67,50,0.35); }
+.btn-outline-forest { background:transparent; color:var(--forest); padding:0.9rem 2.2rem; font-size:0.88rem; font-weight:700; text-decoration:none; border-radius:3px; letter-spacing:0.04em; border:2px solid var(--forest); transition:background 0.2s; cursor:pointer; display:inline-block; text-transform:uppercase; }
+.btn-outline-forest:hover { background:rgba(27,67,50,0.08); }
+
+/* ── FOOTER ── */
+footer { background:var(--charcoal); color:rgba(255,255,255,0.45); padding:60px 6% 40px; }
+.footer-inner { max-width:1140px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr; gap:3rem; margin-bottom:3rem; }
+.footer-brand-name { font-family:'Playfair Display',serif; font-weight:700; color:#fff; font-size:1.3rem; margin-bottom:0.75rem; }
+.footer-brand-name span { color:var(--gold); }
+.footer-tagline { font-size:0.85rem; line-height:1.7; max-width:280px; margin-bottom:1.25rem; }
+.footer-social { display:flex; gap:0.75rem; }
+.social-btn { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:0.85rem; text-decoration:none; transition:background 0.2s; }
+.social-btn:hover { background:var(--gold); }
+.footer-col h4 { color:#fff; font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1rem; }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
+.footer-col ul a { color:rgba(255,255,255,0.45); text-decoration:none; font-size:0.85rem; transition:color 0.2s; }
+.footer-col ul a:hover { color:var(--gold); }
+.footer-bottom { border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.8rem; max-width:1140px; margin:0 auto; }
+.footer-bottom a { color:rgba(255,255,255,0.45); text-decoration:none; }
+.footer-bottom a:hover { color:#fff; }
+
+/* ── BACK TO TOP ── */
+#backToTop {
+  position:fixed; bottom:5.5rem; right:1.5rem; z-index:150;
+  width:44px; height:44px; border-radius:50%; background:var(--forest);
+  color:#fff; border:2px solid rgba(255,255,255,0.15); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+  opacity:0; transform:translateY(10px); transition:all 0.3s; box-shadow:0 4px 16px rgba(0,0,0,0.3);
+}
+#backToTop.visible { opacity:1; transform:translateY(0); }
+#backToTop:hover { background:var(--forest-mid); transform:translateY(-2px); }
+
+/* ── WHATSAPP FLOAT ── */
+#waFloat {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:150;
+  width:54px; height:54px; border-radius:50%;
+  background:#25D366; color:#fff; text-decoration:none;
+  display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+  box-shadow:0 6px 20px rgba(37,211,102,0.5); transition:transform 0.2s, box-shadow 0.2s;
+  animation:pulse-wa 2.5s ease-in-out 3s infinite;
+}
+#waFloat:hover { transform:scale(1.1); box-shadow:0 8px 28px rgba(37,211,102,0.6); animation:none; }
+@keyframes pulse-wa { 0%,100%{box-shadow:0 6px 20px rgba(37,211,102,0.5)} 50%{box-shadow:0 6px 30px rgba(37,211,102,0.8)} }
+.wa-tooltip { position:absolute; right:62px; background:var(--charcoal); color:#fff; font-size:0.78rem; font-weight:500; white-space:nowrap; padding:0.4rem 0.8rem; border-radius:4px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.wa-tooltip::after { content:''; position:absolute; right:-6px; top:50%; transform:translateY(-50%); border:6px solid transparent; border-left-color:var(--charcoal); border-right:none; }
+#waFloat:hover .wa-tooltip { opacity:1; }
+
+/* ── TOAST NOTIFICATION ── */
+#toast {
+  position:fixed; bottom:6.5rem; left:1.5rem; z-index:300;
+  background:#fff; border-radius:8px; padding:0.85rem 1.1rem;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18); border-left:4px solid var(--forest);
+  display:flex; align-items:center; gap:0.75rem;
+  transform:translateX(-120%); transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  max-width:280px;
+}
+#toast.show { transform:translateX(0); }
+.toast-icon { font-size:1.5rem; flex-shrink:0; }
+.toast-text strong { display:block; font-size:0.82rem; font-weight:700; color:var(--forest); }
+.toast-text span { font-size:0.75rem; color:var(--sage); }
+
+/* ── AI CHATBOT (GreenBot) ── */
+#chatToggle {
+  position:fixed; bottom:9.5rem; right:1.5rem; z-index:160;
+  width:58px; height:58px; border-radius:50%; background:var(--forest);
+  color:#fff; border:none; cursor:pointer; font-size:1.5rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 20px rgba(27,67,50,0.45); transition:transform 0.2s, box-shadow 0.2s;
+}
+#chatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(27,67,50,0.55); }
+#chatToggle .chat-dot { position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%; background:var(--gold); border:2px solid var(--cream); }
+#chatPanel {
+  position:fixed; bottom:9.5rem; right:1.5rem; z-index:250;
+  width:340px; max-width:90vw; height:480px; max-height:70vh;
+  background:#fff; border-radius:14px; box-shadow:0 24px 64px rgba(0,0,0,0.3);
+  display:flex; flex-direction:column; overflow:hidden;
+  transform:translateY(16px) scale(0.97); opacity:0; pointer-events:none;
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+#chatPanel.open { transform:translateY(0) scale(1); opacity:1; pointer-events:all; bottom:9.5rem; }
+.chat-header { background:var(--forest); color:#fff; padding:1rem 1.25rem; display:flex; align-items:center; gap:0.75rem; flex-shrink:0; }
+.chat-avatar { width:36px; height:36px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+.chat-header-text { flex:1; }
+.chat-header-text strong { display:block; font-size:0.88rem; font-family:'Playfair Display',serif; }
+.chat-header-text span { font-size:0.7rem; color:rgba(255,255,255,0.55); display:flex; align-items:center; gap:0.3rem; }
+.chat-header-text span::before { content:''; width:6px; height:6px; border-radius:50%; background:#4ADE80; display:inline-block; }
+.chat-close { background:rgba(255,255,255,0.12); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.9rem; }
+.chat-body { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.6rem; background:var(--cream); }
+.chat-msg { max-width:85%; padding:0.6rem 0.85rem; border-radius:12px; font-size:0.83rem; line-height:1.5; }
+.chat-msg.bot { background:#fff; color:var(--charcoal); align-self:flex-start; border-bottom-left-radius:3px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.chat-msg.user { background:var(--forest); color:#fff; align-self:flex-end; border-bottom-right-radius:3px; }
+.chat-quick { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.2rem; }
+.chat-chip { background:#fff; border:1.5px solid var(--sage-light); color:var(--forest); font-size:0.74rem; font-weight:600; padding:0.4rem 0.7rem; border-radius:20px; cursor:pointer; transition:all 0.15s; }
+.chat-chip:hover { background:var(--forest); color:#fff; border-color:var(--forest); }
+.chat-typing { display:flex; gap:4px; padding:0.7rem 0.9rem; background:#fff; border-radius:12px; align-self:flex-start; width:fit-content; }
+.chat-typing span { width:6px; height:6px; border-radius:50%; background:var(--sage); animation:typingBounce 1.2s infinite; }
+.chat-typing span:nth-child(2) { animation-delay:0.2s; }
+.chat-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:0.5} 30%{transform:translateY(-4px);opacity:1} }
+.chat-input-row { display:flex; gap:0.5rem; padding:0.75rem; border-top:1px solid rgba(82,121,111,0.15); background:#fff; flex-shrink:0; }
+.chat-input-row input { flex:1; border:1.5px solid rgba(82,121,111,0.25); border-radius:20px; padding:0.55rem 1rem; font-size:0.83rem; font-family:'Inter',sans-serif; outline:none; }
+.chat-input-row input:focus { border-color:var(--forest); }
+.chat-input-row button { background:var(--forest); color:#fff; border:none; width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:0.95rem; flex-shrink:0; transition:background 0.2s; }
+.chat-input-row button:hover { background:var(--forest-mid); }
+@media(max-width:480px){
+  #chatPanel { right:0.75rem; left:0.75rem; width:auto; bottom:8.5rem; }
+  #chatToggle { right:1rem; bottom:8.5rem; }
+}
+
+/* ══════════════════════════════════
+   BOOKING MODAL
+══════════════════════════════════ */
+.modal-overlay {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(10,25,18,0.8); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:1.5rem; opacity:0; pointer-events:none; transition:opacity 0.25s;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal { background:#fff; border-radius:12px; width:100%; max-width:740px; max-height:90vh; overflow-y:auto; box-shadow:0 40px 100px rgba(0,0,0,0.45); transform:translateY(24px) scale(0.98); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.modal-overlay.open .modal { transform:translateY(0) scale(1); }
+.modal-header { background:var(--forest); padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; border-radius:12px 12px 0 0; position:sticky; top:0; z-index:10; }
+.modal-title { font-family:'Playfair Display',serif; font-weight:700; font-size:1.3rem; color:#fff; }
+.modal-subtitle { font-size:0.8rem; color:rgba(255,255,255,0.5); margin-top:0.15rem; }
+.modal-close { background:rgba(255,255,255,0.1); border:none; color:rgba(255,255,255,0.7); cursor:pointer; font-size:1.2rem; line-height:1; padding:0.4rem 0.6rem; border-radius:4px; transition:all 0.2s; }
+.modal-close:hover { background:rgba(255,255,255,0.2); color:#fff; }
+.modal-body { padding:2rem; }
+.stepper { display:flex; align-items:center; margin-bottom:2rem; }
+.step-dot { width:32px; height:32px; border-radius:50%; background:var(--cream-dark); border:2px solid rgba(82,121,111,0.2); display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:var(--sage); transition:all 0.3s; flex-shrink:0; }
+.step-dot.active { background:var(--forest); border-color:var(--forest); color:#fff; }
+.step-dot.done { background:var(--sage-light); border-color:var(--sage-light); color:#fff; }
+.step-line { flex:1; height:2px; background:rgba(82,121,111,0.15); transition:background 0.4s; }
+.step-line.done { background:var(--sage-light); }
+.service-select-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:0.75rem; margin-bottom:1.5rem; }
+.service-opt { border:2px solid rgba(82,121,111,0.18); border-radius:8px; padding:1.1rem; cursor:pointer; transition:all 0.2s; text-align:center; background:#fff; }
+.service-opt:hover { border-color:var(--sage); background:rgba(82,121,111,0.04); transform:translateY(-2px); }
+.service-opt.selected { border-color:var(--forest); background:rgba(27,67,50,0.05); box-shadow:0 4px 16px rgba(27,67,50,0.1); }
+.service-opt-icon { font-size:1.8rem; margin-bottom:0.5rem; }
+.service-opt-name { font-weight:700; font-size:0.85rem; color:var(--forest); }
+.service-opt-price { font-size:0.78rem; color:var(--sage); margin-top:0.2rem; }
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.cal-month { font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem; color:var(--forest); }
+.cal-nav { background:none; border:1.5px solid rgba(82,121,111,0.25); border-radius:4px; width:32px; height:32px; cursor:pointer; font-size:1rem; color:var(--sage); transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+.cal-nav:hover { background:var(--forest); color:#fff; border-color:var(--forest); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-day-name { text-align:center; font-size:0.7rem; font-weight:700; color:var(--sage); letter-spacing:0.05em; padding:0.4rem 0; text-transform:uppercase; }
+.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:0.85rem; cursor:pointer; transition:all 0.15s; font-weight:500; color:var(--charcoal); border:1.5px solid transparent; }
+.cal-day:hover:not(.empty):not(.past):not(.unavailable) { background:rgba(82,121,111,0.1); border-color:rgba(82,121,111,0.25); }
+.cal-day.empty,.cal-day.past,.cal-day.unavailable { cursor:default; color:rgba(0,0,0,0.2); }
+.cal-day.today { border-color:var(--sage-light); color:var(--forest); font-weight:700; }
+.cal-day.selected { background:var(--forest); color:#fff; border-color:var(--forest); }
+.time-label { font-weight:600; font-size:0.875rem; color:var(--forest); margin:1.5rem 0 0.75rem; }
+.time-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; }
+.time-slot { border:1.5px solid rgba(82,121,111,0.2); border-radius:5px; padding:0.55rem; text-align:center; font-size:0.8rem; font-weight:600; cursor:pointer; color:var(--forest); transition:all 0.15s; background:#fff; }
+.time-slot:hover:not(.taken) { border-color:var(--forest); background:rgba(27,67,50,0.05); }
+.time-slot.selected { background:var(--forest); color:#fff; border-color:var(--forest); }
+.time-slot.taken { color:rgba(0,0,0,0.22); cursor:not-allowed; background:rgba(0,0,0,0.03); text-decoration:line-through; font-weight:400; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-group { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1rem; }
+.form-group label { font-size:0.8rem; font-weight:600; color:var(--forest); letter-spacing:0.03em; }
+.form-group input,.form-group select,.form-group textarea { border:1.5px solid rgba(82,121,111,0.25); border-radius:5px; padding:0.7rem 0.9rem; font-size:0.875rem; font-family:'Inter',sans-serif; color:var(--charcoal); background:#fff; transition:border-color 0.2s; outline:none; }
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus { border-color:var(--forest); box-shadow:0 0 0 3px rgba(27,67,50,0.08); }
+.form-group textarea { resize:vertical; min-height:90px; }
+.booking-summary { background:var(--cream); border-radius:6px; padding:1.5rem; margin-bottom:1.5rem; border:1px solid rgba(82,121,111,0.15); }
+.summary-title { font-weight:700; font-size:0.72rem; color:var(--sage); margin-bottom:0.9rem; letter-spacing:0.1em; text-transform:uppercase; }
+.summary-row { display:flex; justify-content:space-between; align-items:center; font-size:0.875rem; color:#555; padding:0.3rem 0; }
+.summary-row:last-child { border-top:1px solid rgba(82,121,111,0.15); margin-top:0.5rem; padding-top:0.75rem; font-weight:700; color:var(--forest); font-size:1rem; }
+.confirm-card { text-align:center; padding:1.5rem 0; }
+.confirm-icon { font-size:4rem; margin-bottom:1rem; }
+.confirm-title { font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:700; color:var(--forest); margin-bottom:0.75rem; }
+.confirm-msg { color:var(--mid); font-size:0.95rem; line-height:1.7; max-width:420px; margin:0 auto 1.5rem; font-weight:300; }
+.confirm-ref { display:inline-block; background:var(--cream); border:1.5px dashed var(--sage); border-radius:5px; padding:0.6rem 1.75rem; font-size:0.88rem; color:var(--forest); font-weight:700; letter-spacing:0.1em; margin-bottom:1.5rem; }
+.modal-footer { padding:1.25rem 2rem; border-top:1px solid rgba(82,121,111,0.1); display:flex; justify-content:space-between; align-items:center; gap:1rem; background:#fafafa; border-radius:0 0 12px 12px; }
+.modal-footer-note { font-size:0.78rem; color:var(--sage); }
+.modal-btns { display:flex; gap:0.75rem; }
+.btn-back { background:none; border:1.5px solid rgba(82,121,111,0.3); color:var(--sage); padding:0.65rem 1.4rem; border-radius:4px; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.btn-back:hover { border-color:var(--sage); color:var(--forest); }
+.btn-next { background:var(--forest); color:#fff; padding:0.65rem 1.75rem; border-radius:4px; font-size:0.83rem; font-weight:700; cursor:pointer; border:none; transition:background 0.2s; letter-spacing:0.04em; text-transform:uppercase; }
+.btn-next:hover { background:var(--forest-mid); }
+.btn-next:disabled { background:rgba(82,121,111,0.3); cursor:not-allowed; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero { grid-template-columns:1fr; padding:90px 5% 60px; text-align:center; }
+  .hero-subtitle { margin:0 auto 2.5rem; }
+  .hero-actions { justify-content:center; }
+  .hero-stats { justify-content:center; }
+  .hero-image { order:-1; }
+  .hero-image img { width:300px; height:300px; }
+  .hero-image::before { width:340px; height:340px; }
+  .about-inner { grid-template-columns:1fr; gap:2.5rem; }
+  .steps { grid-template-columns:1fr; }
+  .steps::before { display:none; }
+  .footer-inner { grid-template-columns:1fr; gap:2rem; }
+  nav .nav-links { display:none; }
+  .hamburger { display:flex; }
+  .service-select-grid { grid-template-columns:1fr; }
+  .time-grid { grid-template-columns:repeat(3,1fr); }
+  .form-row { grid-template-columns:1fr; }
+  .modal-footer { flex-direction:column-reverse; align-items:stretch; }
+  .modal-btns { justify-content:flex-end; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">Dr.<span>GreenFix</span></div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text">Loading your garden expert…</div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-brand">Dr.<span>GreenFix</span></a>
+  <ul class="nav-links">
+    <li><a href="#services" class="nav-link">Services</a></li>
+    <li><a href="plant-doctor.html" class="nav-link">Plant Doctor</a></li>
+    <li><a href="#gallery" class="nav-link">Gallery</a></li>
+    <li><a href="blog.html" class="nav-link">Blog</a></li>
+    <li><a href="#about" class="nav-link">About</a></li>
+    <li><a href="#faq" class="nav-link">FAQ</a></li>
+    <li><button class="nav-cta nav-link" onclick="openModal(event)" style="border:none;cursor:pointer;font-size:0.85rem;">Book Now</button></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="plant-doctor.html" onclick="closeMenu()">🔬 Plant Doctor</a>
+  <a href="#gallery" onclick="closeMenu()">Gallery</a>
+  <a href="blog.html" onclick="closeMenu()">📝 Blog</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#testimonials" onclick="closeMenu()">Reviews</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#" class="mob-cta" onclick="closeMenu();openModal(event)">📅 Book Now</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-leaf">🌿</div>
+  <div class="hero-text">
+    <div class="hero-eyebrow">🌿 Melbourne-based &nbsp;·&nbsp; Serving clients worldwide</div>
+    <h1 class="hero-title">Your garden has a<br>problem. <em>We have<br>the cure.</em></h1>
+    <p class="hero-subtitle">Expert garden consulting from the comfort of your home — via video call, photo diagnosis, or an in-person visit. Fast, affordable, practical.</p>
+    <div class="hero-actions">
+      <button class="btn-gold" onclick="openModal(event)">📅 Book a Consult</button>
+      <a href="#services" class="btn-ghost">View Services ↓</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" data-count="340">0</div><div class="stat-label">Gardens fixed</div></div>
+      <div class="stat"><div class="stat-num" id="rating">4.9★</div><div class="stat-label">Average rating</div></div>
+      <div class="stat"><div class="stat-num" id="response">24hr</div><div class="stat-label">Response time</div></div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="logo.png" alt="Dr. GreenFix Garden Consulting">
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar reveal">
+  <div class="trust-item"><span class="trust-icon">🔒</span> Secure booking</div>
+  <div class="trust-item"><span class="trust-icon">📅</span> Flexible scheduling</div>
+  <div class="trust-item"><span class="trust-icon">💬</span> Written follow-up included</div>
+  <div class="trust-item"><span class="trust-icon">🌱</span> 340+ gardens helped</div>
+  <div class="trust-item"><span class="trust-icon">⭐</span> 4.9 star rating</div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-header reveal">
+    <div class="eyebrow">Services</div>
+    <h2 class="section-title">Pick your prescription</h2>
+    <p class="section-desc">Three clear options — no confusing packages, no hidden costs. Start simple, upgrade anytime.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal reveal-delay-1">
+      <div class="card-top"><span class="card-top-label">Rx — Quick Fix</span><span class="card-badge">Most Accessible</span></div>
+      <div class="card-body">
+        <div class="card-price"><sup>$</sup>20<span class="card-price-suffix"> – $30</span></div>
+        <h3 class="card-title">Photo Diagnosis</h3>
+        <p class="card-desc">Send photos of your problem plant or garden area. Get a detailed written diagnosis and action plan within 24 hours.</p>
+        <ul class="card-features">
+          <li>Send photos + description of the problem</li>
+          <li>Written expert diagnosis & cause</li>
+          <li>Step-by-step treatment plan</li>
+          <li>One follow-up question included</li>
+        </ul>
+        <button class="card-btn" onclick="openModal(event,'photo')">Get Diagnosis →</button>
+      </div>
+    </div>
+    <div class="service-card card-featured reveal reveal-delay-2">
+      <div class="popular-ribbon">⭐ Most Popular</div>
+      <div class="card-top"><span class="card-top-label">Rx — Video Consult</span><span class="card-badge">Best Value</span></div>
+      <div class="card-body">
+        <div class="card-price"><sup>$</sup>40<span class="card-price-suffix"> – $60</span></div>
+        <h3 class="card-title">Video Consult</h3>
+        <p class="card-desc">Walk through your garden live on Zoom or FaceTime. Real-time expert eyes on your space, instant answers.</p>
+        <ul class="card-features">
+          <li>30–45 minute Zoom or FaceTime session</li>
+          <li>Live garden walkthrough & diagnosis</li>
+          <li>Instant troubleshooting & advice</li>
+          <li>Written summary emailed after the call</li>
+        </ul>
+        <button class="card-btn" onclick="openModal(event,'video')">Book a Call →</button>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <div class="card-top"><span class="card-top-label">Rx — In-Person Visit</span><span class="card-badge">Most Thorough</span></div>
+      <div class="card-body">
+        <div class="card-price"><sup>$</sup>60<span class="card-price-suffix">+</span></div>
+        <h3 class="card-title">Garden Visit Plan</h3>
+        <p class="card-desc">We come to you. An in-person garden consult where Dr. GreenFix walks your space and gives hands-on expert advice.</p>
+        <ul class="card-features">
+          <li>In-person visit at your property</li>
+          <li>Up to 45 minutes on-site consultation</li>
+          <li>Case-by-case assessment & recommendations</li>
+          <li>Written action plan provided after the visit</li>
+        </ul>
+        <button class="card-btn" onclick="openModal(event,'plan')">Book a Visit →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header reveal" style="margin-top:5rem;">
+    <div class="eyebrow">Hands-On Services</div>
+    <h2 class="section-title" style="font-size:clamp(1.5rem,3vw,2.2rem);">Ready to get your hands dirty?</h2>
+    <p class="section-desc">Beyond advice — we can plant it, install it, and keep it thriving all year round.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal reveal-delay-1">
+      <div class="card-top"><span class="card-top-label">Rx — Installation</span><span class="card-badge">Free Quote</span></div>
+      <div class="card-body">
+        <div class="card-price" style="font-size:1.9rem;">Free<span class="card-price-suffix"> quote</span></div>
+        <h3 class="card-title">Planting & Installation</h3>
+        <p class="card-desc">From a single garden bed to a full landscape refresh — we plant it and install it properly, matched to your soil, sun, and style.</p>
+        <ul class="card-features">
+          <li>On-site or photo-based assessment</li>
+          <li>Plant selection suited to your space</li>
+          <li>Garden beds, borders, pots & irrigation</li>
+          <li>Itemised quote — no obligation</li>
+        </ul>
+        <button class="card-btn" onclick="openModal(event,'planting')">Request a Quote →</button>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="card-top"><span class="card-top-label">Rx — Ongoing Care</span><span class="card-badge">Subscription</span></div>
+      <div class="card-body">
+        <div class="card-price"><sup>$</sup>45<span class="card-price-suffix">+ /visit</span></div>
+        <h3 class="card-title">Garden Maintenance Plan</h3>
+        <p class="card-desc">Regular weeding, pruning, feeding, and health checks so your garden always looks after-photo good — not just once, but every season.</p>
+        <ul class="card-features">
+          <li>Weekly, fortnightly or monthly visits</li>
+          <li>Weeding, pruning, mulching & feeding</li>
+          <li>Ongoing pest & disease monitoring</li>
+          <li>Priority booking for photo & video consults</li>
+        </ul>
+        <button class="card-btn" onclick="openModal(event,'maintenance')">Get a Maintenance Quote →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="section-header reveal">
+    <div class="eyebrow">Gallery</div>
+    <h2 class="section-title">Recent work & references</h2>
+    <p class="section-desc">A sample of gardens we've diagnosed, planted, and maintained. Swap these placeholders for your own project photos.</p>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item reveal reveal-delay-1"><img src="https://picsum.photos/seed/greenfix-bed/600/450" alt="Planted garden bed installation" loading="lazy"><div class="gallery-cap">Garden bed installation — Fitzroy</div></div>
+    <div class="gallery-item reveal reveal-delay-2"><img src="https://picsum.photos/seed/greenfix-balcony/600/450" alt="Balcony garden consult" loading="lazy"><div class="gallery-cap">Balcony consult — South Yarra</div></div>
+    <div class="gallery-item reveal reveal-delay-3"><img src="https://picsum.photos/seed/greenfix-vegie/600/450" alt="Vegetable patch planting plan" loading="lazy"><div class="gallery-cap">Vegie patch plan — Brunswick</div></div>
+    <div class="gallery-item reveal reveal-delay-4"><img src="https://picsum.photos/seed/greenfix-maintain/600/450" alt="Ongoing garden maintenance" loading="lazy"><div class="gallery-cap">Maintenance visit — Richmond</div></div>
+    <div class="gallery-item reveal reveal-delay-1"><img src="https://picsum.photos/seed/greenfix-hedge/600/450" alt="Hedge pruning and shaping" loading="lazy"><div class="gallery-cap">Hedge shaping — Collingwood</div></div>
+    <div class="gallery-item reveal reveal-delay-2"><img src="https://picsum.photos/seed/greenfix-indoor/600/450" alt="Indoor plant rescue before and after" loading="lazy"><div class="gallery-cap">Indoor plant rescue — Carlton</div></div>
+  </div>
+  <p class="reveal" style="text-align:center;color:var(--sage);font-size:0.8rem;margin-top:2rem;font-weight:300;">📸 Have your own before/after photos? Reply to any consult email and we'll add them here with your permission.</p>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-header reveal">
+    <div class="eyebrow eyebrow-gold">Process</div>
+    <h2 class="section-title section-title-light">How it works</h2>
+    <p class="section-desc section-desc-light">From sick plant to thriving garden in three easy steps. No jargon, no fluff.</p>
+  </div>
+  <div class="steps">
+    <div class="step reveal reveal-delay-1">
+      <div class="step-icon">1</div>
+      <h3 class="step-title">Choose & book</h3>
+      <p class="step-desc">Pick the service that suits you and book your preferred time slot. Instant confirmation straight to your inbox.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <div class="step-icon">2</div>
+      <h3 class="step-title">Share your garden</h3>
+      <p class="step-desc">Send photos via email, jump on a video call, or invite us to your garden. Walk us through exactly what's going on.</p>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <div class="step-icon">3</div>
+      <h3 class="step-title">Get your cure</h3>
+      <p class="step-desc">Receive a clear, practical plan you can start today. No vague advice — real steps, real results, real gardens fixed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="reveal-left">
+      <h2 class="about-title">Garden problem-solving & improvement consulting</h2>
+      <p class="about-body">You don't need a landscape architect or a weekly gardener. You just need <strong>someone who knows plants</strong> to look at what you've got and tell you exactly what to do.</p>
+      <p class="about-body">That's what Dr. GreenFix does — <strong>online, affordable, practical.</strong> Based in Melbourne, helping home gardeners across Australia and worldwide get their gardens thriving year-round.</p>
+      <button class="btn-gold" onclick="openModal(event)" style="margin-top:0.5rem;">Book a Consult →</button>
+    </div>
+    <div class="problem-grid reveal-right">
+      <div class="problem-pill">🌱 Sick & dying plants</div>
+      <div class="problem-pill">📐 Layout & design issues</div>
+      <div class="problem-pill">🌍 Soil & drainage problems</div>
+      <div class="problem-pill">🪴 Pots & placement</div>
+      <div class="problem-pill">🌸 What to plant where</div>
+      <div class="problem-pill">🗓️ Seasonal planting advice</div>
+      <div class="problem-pill">🐛 Pests & disease</div>
+      <div class="problem-pill">✨ General garden upgrades</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="section-header reveal">
+    <div class="eyebrow">Reviews</div>
+    <h2 class="section-title">What clients say</h2>
+    <p class="section-desc">Real results from real Melbourne gardens — and beyond.</p>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal reveal-delay-1">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">My fiddle leaf fig was basically on death row. One photo diagnosis and two weeks later it's shooting new leaves. Couldn't believe how simple the fix was once someone actually looked at it properly.</p>
+      <div class="testi-author"><div class="testi-avatar">SR</div><div><div class="testi-name">Sarah R.</div><div class="testi-loc">Fitzroy, Melbourne</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-2">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">Booked the video consult for my balcony garden. Worth every cent. He spotted three problems I hadn't even noticed and gave me a clear plan to fix them all. My balcony looks incredible now.</p>
+      <div class="testi-author"><div class="testi-avatar">MJ</div><div><div class="testi-name">Marcus J.</div><div class="testi-loc">South Yarra, Melbourne</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-3">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">I've been trying to get my vegie patch right for two seasons. The garden visit plan was a game changer — he came out, walked the whole space, and the planting schedule alone saved me so much wasted effort.</p>
+      <div class="testi-author"><div class="testi-avatar">TK</div><div><div class="testi-name">Tracey K.</div><div class="testi-loc">Brunswick, Melbourne</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="section-header reveal">
+    <div class="eyebrow">FAQ</div>
+    <h2 class="section-title">Common questions</h2>
+    <p class="section-desc">Everything you need to know before booking.</p>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How quickly will I get a response after booking? <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">For photo diagnoses, you'll receive a full written response within 24 hours of sending your photos — usually sooner. Video consults are scheduled at your chosen time slot, and garden visits are arranged within 2–5 business days depending on your location in Melbourne.</div></div>
+    </div>
+    <div class="faq-item reveal reveal-delay-1">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Do I need to be in Melbourne to use your services? <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Not at all. Photo diagnoses and video consults are available to anyone anywhere in Australia or worldwide. In-person garden visits are currently available within the Melbourne metro area. If you're unsure whether your suburb is covered, just send us a message before booking.</div></div>
+    </div>
+    <div class="faq-item reveal reveal-delay-2">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What if I'm not happy with the advice I receive? <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Your satisfaction is our priority. If you feel the advice didn't address your garden problem, reach out within 7 days of your consult and we'll make it right — whether that's a follow-up session, additional written advice, or a full refund at our discretion.</div></div>
+    </div>
+    <div class="faq-item reveal reveal-delay-3">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What platform do you use for video consults? <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">We use Zoom or FaceTime — whichever works best for you. Once you've booked, we'll confirm the platform via email. All you need is a smartphone or computer with a camera so you can walk around your garden during the call.</div></div>
+    </div>
+    <div class="faq-item reveal reveal-delay-4">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How many photos should I send for a photo diagnosis? <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">The more the better — aim for 4 to 8 clear photos. Include close-ups of any affected leaves, stems, or roots, a wider shot of the whole plant, and a photo of the pot or garden bed. Also let us know how often you water and where the plant sits (indoors/outdoors, sun/shade).</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<section class="cta-strip" id="book">
+  <h2 class="reveal">Ready to fix your garden?</h2>
+  <p class="reveal reveal-delay-1">Start with a $20 photo diagnosis — expert advice in your inbox within 24 hours. No visit, no fuss.</p>
+  <div class="cta-btns reveal reveal-delay-2">
+    <button class="btn-forest" onclick="openModal(event)">📅 Book Now</button>
+    <a href="mailto:hello@drgreenfix.com.au" class="btn-outline-forest">📩 Send an Email</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">Dr.<span>GreenFix</span></div>
+      <p class="footer-tagline">Melbourne-based garden consulting, available online worldwide. Sick plants, layout advice, video consults & in-person visits — we fix it.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" title="Instagram">📸</a>
+        <a href="#" class="social-btn" title="Facebook">📘</a>
+        <a href="#" class="social-btn" title="TikTok">🎵</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#" onclick="openModal(event,'photo')">Photo Diagnosis — $20</a></li>
+        <li><a href="#" onclick="openModal(event,'video')">Video Consult — $40</a></li>
+        <li><a href="#" onclick="openModal(event,'plan')">Garden Visit Plan — $60+</a></li>
+        <li><a href="#" onclick="openModal(event,'planting')">Planting & Installation</a></li>
+        <li><a href="#" onclick="openModal(event,'maintenance')">Garden Maintenance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About Dr. GreenFix</a></li>
+        <li><a href="plant-doctor.html">🔬 Plant Doctor Tool</a></li>
+        <li><a href="blog.html">📝 Garden Blog</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#testimonials">Client Reviews</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="mailto:hello@drgreenfix.com.au">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Dr. GreenFix Garden Consulting · Melbourne, Australia</div>
+    <div><a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a></div>
+  </div>
+</footer>
+
+<!-- BACK TO TOP -->
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/61400000000" id="waFloat" target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <span>💬</span>
+  <div class="wa-tooltip">Chat on WhatsApp</div>
+</a>
+
+<!-- AI CHATBOT -->
+<button id="chatToggle" onclick="toggleChat()" title="Chat with GreenBot">
+  🌿<span class="chat-dot"></span>
+</button>
+<div id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-header-text">
+      <strong>GreenBot</strong>
+      <span>Online — usually replies instantly</span>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask about pests, pricing, booking…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <div class="toast-icon">🌿</div>
+  <div class="toast-text">
+    <strong id="toastName">Someone in Melbourne</strong>
+    <span id="toastMsg">just booked a Video Consult</span>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal" onclick="handleOverlayClick(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">📅 Book Your Consult</div>
+        <div class="modal-subtitle" id="modalSubtitle">Dr. GreenFix · Garden Consulting</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="stepper" id="stepper">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-dot" id="dot3">3</div>
+        <div class="step-line" id="line3"></div>
+        <div class="step-dot" id="dot4">✓</div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="step1">
+        <p style="font-size:0.9rem;color:var(--mid);margin-bottom:1.25rem;font-weight:300;">Which service would you like to book?</p>
+        <div class="service-select-grid">
+          <div class="service-opt" onclick="selectService('photo')" id="opt-photo">
+            <div class="service-opt-icon">📸</div>
+            <div class="service-opt-name">Photo Diagnosis</div>
+            <div class="service-opt-price">$20 – $30</div>
+          </div>
+          <div class="service-opt" onclick="selectService('video')" id="opt-video">
+            <div class="service-opt-icon">📹</div>
+            <div class="service-opt-name">Video Consult</div>
+            <div class="service-opt-price">$40 – $60</div>
+          </div>
+          <div class="service-opt" onclick="selectService('plan')" id="opt-plan">
+            <div class="service-opt-icon">🏡</div>
+            <div class="service-opt-name">Garden Visit Plan</div>
+            <div class="service-opt-price">From $60</div>
+          </div>
+          <div class="service-opt" onclick="selectService('planting')" id="opt-planting">
+            <div class="service-opt-icon">🌱</div>
+            <div class="service-opt-name">Planting & Installation</div>
+            <div class="service-opt-price">Free quote</div>
+          </div>
+          <div class="service-opt" onclick="selectService('maintenance')" id="opt-maintenance">
+            <div class="service-opt-icon">✂️</div>
+            <div class="service-opt-name">Garden Maintenance</div>
+            <div class="service-opt-price">From $45/visit</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="step2" style="display:none;">
+        <p style="font-size:0.9rem;color:var(--mid);margin-bottom:1.25rem;font-weight:300;">Pick a date and time that suits you.</p>
+        <div class="cal-header">
+          <button class="cal-nav" onclick="prevMonth()">‹</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav" onclick="nextMonth()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div id="timeSection" style="display:none;">
+          <div class="time-label" id="timeLabel">Available times</div>
+          <div class="time-grid" id="timeGrid"></div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="step3" style="display:none;">
+        <p style="font-size:0.9rem;color:var(--mid);margin-bottom:1.25rem;font-weight:300;">Just a few quick details and you're all set.</p>
+        <div class="form-row">
+          <div class="form-group"><label>First name *</label><input type="text" id="fname" placeholder="e.g. Sarah"></div>
+          <div class="form-group"><label>Last name</label><input type="text" id="lname" placeholder="e.g. Richards"></div>
+        </div>
+        <div class="form-group"><label>Email address *</label><input type="email" id="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Phone number (optional)</label><input type="tel" id="phone" placeholder="04xx xxx xxx"></div>
+        <div class="form-group"><label>Tell us about your garden problem</label><textarea id="notes" placeholder="e.g. My fiddle leaf fig has brown spots and keeps dropping leaves. It's indoors near a north-facing window..."></textarea></div>
+        <div class="booking-summary" id="summaryBox">
+          <div class="summary-title">Booking summary</div>
+          <div class="summary-row"><span>Service</span><span id="sumService">—</span></div>
+          <div class="summary-row"><span>Date & Time</span><span id="sumDateTime">—</span></div>
+          <div class="summary-row"><span>Total</span><span id="sumPrice">—</span></div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div id="step4" style="display:none;">
+        <div class="confirm-card">
+          <div class="confirm-icon">🌱</div>
+          <h3 class="confirm-title">You're booked in!</h3>
+          <p class="confirm-msg">A confirmation has been sent to your email. Dr. GreenFix will be in touch within 2 hours to confirm all details.</p>
+          <div class="confirm-ref" id="confirmRef">REF #GF-00000</div>
+          <p style="font-size:0.85rem;color:var(--sage);margin-bottom:1.5rem;font-weight:300;">Check your inbox (and spam folder) for your confirmation email.</p>
+          <button class="btn-gold" onclick="closeModal()">Done — Back to Site</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" id="modalFooter">
+      <div class="modal-footer-note">🔒 Secure booking · No payment taken now</div>
+      <div class="modal-btns">
+        <button class="btn-back" id="btnBack" onclick="prevStep()" style="display:none;">← Back</button>
+        <button class="btn-next" id="btnNext" onclick="nextStep()" disabled>Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── LOADER ──
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1400);
+});
+
+// ── NAV SCROLL ──
+const mainNav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  mainNav.classList.toggle('scrolled', window.scrollY > 60);
+  document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 400);
+  highlightNav();
+});
+
+function highlightNav() {
+  const sections = ['home','services','gallery','how','about','testimonials','faq'];
+  let current = '';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 120) current = id;
+  });
+  document.querySelectorAll('.nav-link').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+}
+
+// ── MOBILE MENU ──
+function toggleMenu() {
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => observer.observe(el));
+
+// ── COUNTER ANIMATION ──
+function animateCounter(el, target, duration=1800) {
+  let start = 0, step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { el.textContent = target+'+'; clearInterval(timer); }
+    else el.textContent = Math.floor(start)+'+';
+  }, 16);
+}
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      animateCounter(el, parseInt(el.dataset.count));
+      counterObs.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+// ── FAQ ──
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── TOAST NOTIFICATIONS ──
+const toastData = [
+  {name:'Sarah in Fitzroy', msg:'just booked a Photo Diagnosis'},
+  {name:'Marcus in South Yarra', msg:'just booked a Video Consult'},
+  {name:'Tracey in Brunswick', msg:'just booked a Garden Visit'},
+  {name:'David in Richmond', msg:'just booked a Photo Diagnosis'},
+  {name:'Emma in Collingwood', msg:'just booked a Video Consult'},
+];
+let toastIdx = 0;
+function showToast() {
+  const t = document.getElementById('toast');
+  const d = toastData[toastIdx++ % toastData.length];
+  document.getElementById('toastName').textContent = d.name;
+  document.getElementById('toastMsg').textContent = d.msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+setTimeout(() => { showToast(); setInterval(showToast, 14000); }, 5000);
+
+// ── MODAL ──
+let currentStep=1, selectedService=null, selectedDate=null, selectedTime=null, calYear, calMonth;
+// Booking form submissions are sent here so you get them by email.
+// Dashboard: https://formspree.io/forms  (login to see every submission)
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mnjkwpav';
+
+const services = {
+  photo:{name:'Photo Diagnosis',price:'$25',duration:'24hr response'},
+  video:{name:'Video Consult',price:'$50',duration:'45 min session'},
+  plan:{name:'Garden Visit Plan',price:'$65',duration:'Up to 45 min in-person'},
+  planting:{name:'Planting & Installation Quote',price:'Free quote',duration:'Site assessment'},
+  maintenance:{name:'Garden Maintenance Plan',price:'From $45/visit',duration:'Ongoing service'}
+};
+const takenSlots = { photo:['9:00 AM','2:30 PM'], video:['10:00 AM','3:00 PM'], plan:['11:00 AM'], planting:['1:00 PM'], maintenance:['9:30 AM'] };
+
+function openModal(e, preselect) {
+  e && e.preventDefault();
+  document.getElementById('bookingModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  resetModal();
+  if (preselect) selectService(preselect);
+  const now = new Date(); calYear=now.getFullYear(); calMonth=now.getMonth();
+  renderCalendar();
+}
+function closeModal() {
+  document.getElementById('bookingModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function handleOverlayClick(e) { if(e.target===document.getElementById('bookingModal')) closeModal(); }
+function resetModal() {
+  currentStep=1; selectedService=null; selectedDate=null; selectedTime=null;
+  showStep(1);
+  document.querySelectorAll('.service-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('btnNext').disabled=true;
+  document.getElementById('btnBack').style.display='none';
+  ['fname','lname','email','phone','notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+function showStep(n) {
+  for(let i=1;i<=4;i++) {
+    document.getElementById('step'+i).style.display=(i===n)?'block':'none';
+    const dot=document.getElementById('dot'+i);
+    dot.classList.remove('active','done');
+    if(i<n) dot.classList.add('done');
+    else if(i===n) dot.classList.add('active');
+    if(i<4) document.getElementById('line'+i).classList.toggle('done',i<n);
+  }
+  document.getElementById('modalFooter').style.display=(n===4)?'none':'flex';
+  document.getElementById('btnBack').style.display=(n>1)?'block':'none';
+  currentStep=n; validateStep();
+}
+function nextStep() {
+  if(!validateStep()) return;
+  if(currentStep===3){confirmBooking();return;}
+  if(currentStep===2) fillSummary();
+  showStep(currentStep+1);
+}
+function prevStep() { if(currentStep>1) showStep(currentStep-1); }
+function validateStep() {
+  let ok=false;
+  if(currentStep===1) ok=!!selectedService;
+  if(currentStep===2) ok=!!(selectedDate&&selectedTime);
+  if(currentStep===3) {
+    const f=document.getElementById('fname').value.trim();
+    const e=document.getElementById('email').value.trim();
+    ok=f.length>0&&e.includes('@');
+  }
+  const btn=document.getElementById('btnNext');
+  btn.disabled=!ok;
+  btn.textContent=currentStep===3?'Confirm Booking ✓':'Continue →';
+  return ok;
+}
+['fname','lname','email','phone','notes'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input',validateStep);
+});
+function selectService(type) {
+  selectedService=type;
+  document.querySelectorAll('.service-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('opt-'+type).classList.add('selected');
+  document.getElementById('modalSubtitle').textContent=services[type].name+' · '+services[type].price;
+  validateStep();
+}
+function renderCalendar() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonth').textContent=months[calMonth]+' '+calYear;
+  const grid=document.getElementById('calGrid'); grid.innerHTML='';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{const el=document.createElement('div');el.className='cal-day-name';el.textContent=d;grid.appendChild(el);});
+  const today=new Date(); today.setHours(0,0,0,0);
+  const first=new Date(calYear,calMonth,1).getDay();
+  const total=new Date(calYear,calMonth+1,0).getDate();
+  for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+  for(let d=1;d<=total;d++){
+    const el=document.createElement('div');
+    const date=new Date(calYear,calMonth,d);
+    const dow=date.getDay();
+    const isPast=date<today;
+    const isToday=date.getTime()===today.getTime();
+    el.className='cal-day'; el.textContent=d;
+    if(isPast) el.classList.add('past');
+    else if(dow===0||dow===6) el.classList.add('unavailable');
+    else {
+      if(isToday) el.classList.add('today');
+      const ds=calYear+'-'+(calMonth+1)+'-'+d;
+      if(selectedDate===ds) el.classList.add('selected');
+      el.onclick=()=>selectDate(ds,d,el);
+    }
+    grid.appendChild(el);
+  }
+}
+function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function selectDate(ds,day,el){
+  selectedDate=ds; selectedTime=null;
+  document.querySelectorAll('.cal-day.selected').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected'); renderTimeSlots(ds); validateStep();
+}
+function renderTimeSlots(ds) {
+  const ts=document.getElementById('timeSection');
+  const tg=document.getElementById('timeGrid');
+  ts.style.display='block';
+  const d=new Date(ds.replace(/(\d+)-(\d+)-(\d+)/,'$1/$2/$3'));
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  document.getElementById('timeLabel').textContent='Available times — '+dayNames[d.getDay()];
+  const slots=['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM'];
+  const taken=(takenSlots[selectedService]||[]);
+  tg.innerHTML='';
+  slots.forEach(t=>{
+    const el=document.createElement('div');
+    el.className='time-slot'+(taken.includes(t)?' taken':'');
+    el.textContent=t;
+    if(!taken.includes(t)){
+      if(selectedTime===t) el.classList.add('selected');
+      el.onclick=()=>selectTime(t,el);
+    }
+    tg.appendChild(el);
+  });
+}
+function selectTime(t,el){
+  selectedTime=t;
+  document.querySelectorAll('.time-slot.selected').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected'); validateStep();
+}
+function fillSummary(){
+  const s=services[selectedService];
+  document.getElementById('sumService').textContent=s.name;
+  const d=new Date(selectedDate.replace(/(\d+)-(\d+)-(\d+)/,'$1/$2/$3'));
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('sumDateTime').textContent=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+', '+selectedTime;
+  document.getElementById('sumPrice').textContent=s.price;
+}
+async function confirmBooking(){
+  const fname=document.getElementById('fname').value.trim();
+  const lname=document.getElementById('lname').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const notes=document.getElementById('notes').value.trim();
+  if(!fname||!email.includes('@')){validateStep();return;}
+  const ref='GF-'+Math.floor(10000+Math.random()*90000);
+  const s=services[selectedService]||{name:selectedService,price:''};
+
+  const btn=document.getElementById('btnNext');
+  const originalText=btn.textContent;
+  btn.disabled=true; btn.textContent='Sending…';
+
+  try {
+    await fetch(FORMSPREE_ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({
+        _subject:'🌿 New booking: '+s.name+' — '+fname+' '+lname,
+        booking_ref:ref,
+        name:fname+' '+lname,
+        email:email,
+        phone:phone||'(not provided)',
+        service:s.name,
+        price:s.price,
+        date:selectedDate,
+        time:selectedTime,
+        notes:notes||'(none)'
+      })
+    });
+  } catch(err) {
+    console.warn('Booking notification failed to send (site owner should check Formspree/spam folder):', err);
+  }
+
+  document.getElementById('confirmRef').textContent='Booking Ref: #'+ref;
+  showStep(4);
+  btn.disabled=false; btn.textContent=originalText;
+}
+
+// ══════════════════════════════════
+// GREENBOT — AI-style chat concierge
+// Rule-based assistant: answers common questions, takes notes on the
+// user's garden problem, and hands off straight into the booking flow.
+// (To upgrade to a true LLM-powered bot, wire sendChat() to a backend
+// endpoint that calls the Claude API server-side — never expose an API
+// key in client-side code.)
+// ══════════════════════════════════
+let chatOpened = false;
+let chatNotes = JSON.parse(localStorage.getItem('gf_chat_notes') || '[]');
+
+// ── AI BACKEND CONFIG ──
+// Point this at your deployed backend (see /backend/README.md) to give
+// GreenBot real Claude-powered answers. Until then, it runs on the
+// rule-based fallback below — and it auto-falls-back any time the
+// backend is unreachable, so the chat never breaks.
+const AI_CHAT_ENDPOINT = 'PASTE_YOUR_BACKEND_URL_HERE';
+let aiChatHistory = [];
+
+async function getBotReply(text) {
+  const backendConfigured = AI_CHAT_ENDPOINT && !AI_CHAT_ENDPOINT.includes('PASTE_YOUR_BACKEND_URL_HERE');
+  if (backendConfigured) {
+    try {
+      const res = await fetch(AI_CHAT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: aiChatHistory }),
+      });
+      if (!res.ok) throw new Error('backend status ' + res.status);
+      const data = await res.json();
+      if (!data.reply) throw new Error('no reply field');
+      aiChatHistory.push({ role: 'user', content: text }, { role: 'assistant', content: data.reply });
+      if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+      return data.reply;
+    } catch (err) {
+      console.warn('GreenBot AI backend unavailable, using fallback:', err);
+    }
+  }
+  return botFind(text) || "Got it — I've noted that down for Dr. GreenFix. Want to jump straight into booking, or ask me something else? You can also try our Plant Doctor tool for a symptom checker.";
+}
+
+const botKB = [
+  { k:['hi','hello','hey','g\'day'], r:"Hey there! 👋 I'm GreenBot, Dr. GreenFix's garden assistant. I can answer quick questions, jot down notes about your garden problem, or help you book straight away. What's going on?" },
+  { k:['price','cost','how much','pricing'], r:"Here's our pricing at a glance:\n📸 Photo Diagnosis — $20–$30\n📹 Video Consult — $40–$60\n🏡 Garden Visit — $60+\n🌱 Planting & Installation — free quote\n✂️ Maintenance Plan — from $45/visit\nWant me to start a booking?" },
+  { k:['pest','bug','insect','aphid','snail','caterpillar'], r:"Pests are one of our most common calls 🐛. For a quick lead: aphids cluster on new growth, caterpillars leave chewed holes, and snails leave a silvery trail. For an exact ID, try our Plant Doctor tool, or send photos for a $20 Photo Diagnosis and we'll pin it down and give you a treatment plan." },
+  { k:['disease','fungus','mould','mold','spots','yellow','wilt','blight'], r:"Sounds like it could be fungal or a nutrient issue — both are very fixable. Our Plant Doctor tool has a symptom checker, or for a definite answer, a Photo Diagnosis ($20–$30) gets you a written cause + treatment plan within 24hrs." },
+  { k:['fertiliser','fertilizer','feed','nutrient','npk'], r:"Quick rule of thumb: leafy growth = more Nitrogen (N), flowers/fruit = more Phosphorus & Potassium (P-K), and yellowing between leaf veins is often a magnesium or iron deficiency. Check the full Fertiliser Guide on our Plant Doctor page for feeding schedules by plant type." },
+  { k:['maintenance','mow','prune','weekly','fortnightly','ongoing'], r:"Our Garden Maintenance Plan covers weeding, pruning, mulching, feeding & pest checks — weekly, fortnightly or monthly, from $45/visit. Want a free quote?" },
+  { k:['plant','install','landscap','garden bed','irrigation'], r:"For planting & installation we do a free on-site or photo-based assessment, then send an itemised quote — no obligation. Want me to note down what you're after?" },
+  { k:['melbourne','location','where','area','suburb'], r:"We're based in Melbourne — in-person visits and installs currently cover the Melbourne metro area. Photo diagnosis & video consults are available anywhere in the world 🌍." },
+  { k:['book','appointment','schedule','consult'], r:"Great — I've noted that down. Tap 'Open booking form' below and I'll carry your notes straight across so you don't have to repeat yourself." },
+  { k:['human','real person','talk to someone'], r:"Totally understand — you can reach Dr. GreenFix directly on WhatsApp (the 💬 button bottom-right) or email hello@drgreenfix.com.au." },
+  { k:['thank','thanks','cheers'], r:"You're very welcome! 🌿 Anything else about your garden I can help with?" },
+];
+
+function botFind(msg) {
+  const m = msg.toLowerCase();
+  for (const entry of botKB) if (entry.k.some(kw => m.includes(kw))) return entry.r;
+  return null;
+}
+
+function chatBubble(sender, text) {
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + sender;
+  div.style.whiteSpace = 'pre-line';
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return div;
+}
+
+function chatQuickReplies(options) {
+  const body = document.getElementById('chatBody');
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-quick';
+  options.forEach(opt => {
+    const chip = document.createElement('button');
+    chip.className = 'chat-chip';
+    chip.textContent = opt.label;
+    chip.onclick = opt.action;
+    wrap.appendChild(chip);
+  });
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+}
+
+function chatTyping(show) {
+  let el = document.getElementById('chatTypingDots');
+  if (show) {
+    if (el) return;
+    const body = document.getElementById('chatBody');
+    el = document.createElement('div');
+    el.className = 'chat-typing'; el.id = 'chatTypingDots';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    body.appendChild(el); body.scrollTop = body.scrollHeight;
+  } else if (el) el.remove();
+}
+
+function saveChatNote(text) {
+  chatNotes.push(text);
+  localStorage.setItem('gf_chat_notes', JSON.stringify(chatNotes));
+}
+
+function openBookingFromChat() {
+  toggleChat();
+  const summary = chatNotes.slice(-6).join(' · ');
+  openModal();
+  setTimeout(() => {
+    const notesEl = document.getElementById('notes');
+    if (notesEl && summary) notesEl.value = 'From GreenBot chat: ' + summary;
+  }, 50);
+}
+
+function initChat() {
+  if (chatOpened) return;
+  chatOpened = true;
+  chatBubble('bot', "Hi! I'm GreenBot 🌿 — I can answer garden questions, take notes about your problem, and book you in. What can I help with?");
+  chatQuickReplies([
+    { label:'📅 Book an appointment', action:() => userSend('I want to book an appointment') },
+    { label:'🐛 Pest or disease?', action:() => userSend('I have a pest or disease problem') },
+    { label:'💰 Pricing', action:() => userSend('How much does it cost?') },
+    { label:'🌿 Fertilizer tips', action:() => userSend('fertilizer tips') },
+  ]);
+}
+
+function userSend(text) {
+  if (!text.trim()) return;
+  chatBubble('user', text);
+  saveChatNote(text);
+  document.getElementById('chatInput').value = '';
+  chatTyping(true);
+  getBotReply(text).then(reply => {
+    chatTyping(false);
+    chatBubble('bot', reply);
+    if (/book|appointment|schedule/i.test(text)) {
+      chatQuickReplies([{ label:'📋 Open booking form →', action: openBookingFromChat }]);
+    }
+  });
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  userSend(input.value);
+}
+
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) { initChat(); document.getElementById('chatInput').focus(); }
+}
+
+// Auto-open booking modal + prefill notes if arriving from another page's chat handoff
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(location.search);
+  if (params.get('book') === '1') {
+    setTimeout(() => {
+      openModal();
+      const notesEl = document.getElementById('notes');
+      const stored = JSON.parse(localStorage.getItem('gf_chat_notes') || '[]');
+      if (notesEl && stored.length) notesEl.value = 'From GreenBot chat: ' + stored.slice(-6).join(' · ');
+    }, 900);
+  }
+});
+
+// close mobile menu on outside click
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mobileMenu');
+  const burger = document.getElementById('hamburger');
+  if (menu.classList.contains('open') && !menu.contains(e.target) && !burger.contains(e.target)) closeMenu();
+});
+</script>
+</body>
+</html>

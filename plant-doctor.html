@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Doctor – Diagnose Diseases, Pests & Fertiliser Needs | Dr. GreenFix</title>
+<meta name="description" content="Free interactive symptom checker to identify plant diseases, pests, and fertiliser deficiencies. Backed by Dr. GreenFix garden consulting, Melbourne.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --forest: #1B4332; --forest-mid: #2D6A4F; --sage: #52796F;
+  --sage-light: #84A98C; --gold: #E9C46A; --gold-dark: #C9A84C;
+  --cream: #F8F3E8; --cream-dark: #EFE9D8; --charcoal: #1E1E1E;
+  --mid: #555; --white: #FFFFFF; --rust:#C1502E;
+}
+html { scroll-behavior: smooth; }
+body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--charcoal); line-height:1.6; overflow-x:hidden; }
+
+nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(27,67,50,0.97); backdrop-filter:blur(14px); display:flex; align-items:center; justify-content:space-between; padding:0 6%; height:68px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.nav-brand { font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#fff; text-decoration:none; display:flex; align-items:center; gap:0.5rem; }
+.nav-brand span { color:var(--gold); }
+.nav-links { display:flex; gap:2rem; list-style:none; align-items:center; }
+.nav-links a { color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.85rem; font-weight:500; letter-spacing:0.03em; }
+.nav-links a:hover, .nav-links a.active { color:#fff; }
+.nav-cta { background:var(--gold) !important; color:var(--forest) !important; padding:0.45rem 1.25rem; border-radius:3px; font-weight:700 !important; text-decoration:none; font-size:0.85rem; }
+.nav-cta:hover { background:var(--gold-dark) !important; }
+.hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+.hamburger span { display:block; width:24px; height:2px; background:#fff; border-radius:2px; transition:all 0.3s; }
+.hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+.mobile-menu { position:fixed; top:68px; left:0; right:0; z-index:190; background:rgba(27,67,50,0.98); backdrop-filter:blur(14px); padding:1.5rem 6%; display:flex; flex-direction:column; gap:1rem; transform:translateY(-120%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); border-bottom:1px solid rgba(255,255,255,0.1); }
+.mobile-menu.open { transform:translateY(0); }
+.mobile-menu a { color:rgba(255,255,255,0.8); text-decoration:none; font-size:1rem; font-weight:500; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+.mobile-menu a:last-child { border:none; }
+.mobile-menu .mob-cta { background:var(--gold); color:var(--forest); font-weight:700; padding:0.75rem 1rem; border-radius:3px; text-align:center; border:none; margin-top:0.5rem; }
+
+.page-hero { background:linear-gradient(135deg, #0a1f15 0%, #1B4332 55%, #2D6A4F 100%); padding:140px 6% 70px; text-align:center; }
+.page-eyebrow { display:inline-block; color:var(--gold); font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:1rem; }
+.page-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4.5vw,3.2rem); font-weight:900; color:#fff; margin-bottom:1rem; }
+.page-sub { color:rgba(255,255,255,0.6); font-size:1rem; max-width:600px; margin:0 auto; font-weight:300; }
+
+.section { max-width:1140px; margin:0 auto; padding:90px 6%; }
+.section-header { text-align:center; margin-bottom:3rem; }
+.eyebrow { display:inline-block; color:var(--sage); font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.9rem; }
+.section-title { font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3.5vw,2.5rem); font-weight:700; color:var(--forest); }
+.section-desc { color:var(--sage); font-size:0.95rem; max-width:520px; margin:0.9rem auto 0; font-weight:300; }
+
+/* SYMPTOM CHECKER */
+.checker { background:#fff; border-radius:14px; padding:2.5rem; box-shadow:0 20px 60px rgba(27,67,50,0.1); border:1px solid rgba(82,121,111,0.12); }
+.checker-step-label { font-weight:700; color:var(--forest); font-size:0.85rem; margin-bottom:1rem; letter-spacing:0.03em; }
+.symptom-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.7rem; margin-bottom:2rem; }
+.symptom-opt { display:flex; align-items:center; gap:0.6rem; border:1.5px solid rgba(82,121,111,0.2); border-radius:8px; padding:0.75rem 1rem; cursor:pointer; transition:all 0.2s; font-size:0.85rem; }
+.symptom-opt:hover { border-color:var(--sage); background:rgba(82,121,111,0.05); }
+.symptom-opt.checked { border-color:var(--forest); background:rgba(27,67,50,0.06); }
+.symptom-opt input { accent-color:var(--forest); width:16px; height:16px; flex-shrink:0; }
+.btn-diagnose { background:var(--forest); color:#fff; border:none; padding:0.9rem 2.2rem; border-radius:4px; font-weight:700; font-size:0.88rem; letter-spacing:0.04em; text-transform:uppercase; cursor:pointer; transition:background 0.2s; }
+.btn-diagnose:hover { background:var(--forest-mid); }
+.btn-diagnose:disabled { background:rgba(82,121,111,0.3); cursor:not-allowed; }
+.diag-results { margin-top:2rem; display:none; }
+.diag-results.show { display:block; }
+.diag-card { border:1.5px solid rgba(82,121,111,0.18); border-left:5px solid var(--gold); border-radius:8px; padding:1.5rem; margin-bottom:1rem; background:var(--cream); }
+.diag-card h4 { font-family:'Playfair Display',serif; color:var(--forest); font-size:1.1rem; margin-bottom:0.3rem; }
+.diag-match { font-size:0.72rem; color:var(--gold-dark); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.7rem; }
+.diag-card p { font-size:0.87rem; color:#444; font-weight:300; line-height:1.7; margin-bottom:0.4rem; }
+.diag-card strong { color:var(--forest); }
+.diag-empty { text-align:center; color:var(--sage); font-size:0.9rem; padding:1rem; }
+.diag-cta { margin-top:1.5rem; background:var(--forest); border-radius:8px; padding:1.5rem; text-align:center; }
+.diag-cta p { color:rgba(255,255,255,0.75); font-size:0.85rem; margin-bottom:0.9rem; font-weight:300; }
+
+/* LIBRARY */
+.lib-filter { display:flex; gap:0.6rem; flex-wrap:wrap; justify-content:center; margin-bottom:2.5rem; }
+.filter-chip { background:#fff; border:1.5px solid rgba(82,121,111,0.25); color:var(--forest); font-size:0.8rem; font-weight:600; padding:0.5rem 1.1rem; border-radius:20px; cursor:pointer; transition:all 0.2s; }
+.filter-chip.active { background:var(--forest); color:#fff; border-color:var(--forest); }
+.lib-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; }
+.lib-card { background:#fff; border-radius:10px; overflow:hidden; border:1px solid rgba(82,121,111,0.13); transition:transform 0.25s, box-shadow 0.25s; }
+.lib-card:hover { transform:translateY(-6px); box-shadow:0 20px 44px rgba(27,67,50,0.12); }
+.lib-card img { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
+.lib-card-body { padding:1.4rem; }
+.lib-cat { display:inline-block; font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:0.22rem 0.6rem; border-radius:3px; margin-bottom:0.7rem; }
+.lib-cat.pest { background:rgba(193,80,46,0.13); color:var(--rust); }
+.lib-cat.disease { background:rgba(233,196,106,0.2); color:var(--gold-dark); }
+.lib-card h4 { font-family:'Playfair Display',serif; color:var(--forest); font-size:1.05rem; margin-bottom:0.5rem; }
+.lib-card p { font-size:0.82rem; color:var(--mid); font-weight:300; line-height:1.65; margin-bottom:0.3rem; }
+
+/* FERTILISER */
+.fert-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.25rem; margin-bottom:3rem; }
+.fert-card { background:#fff; border-radius:10px; padding:1.5rem; border:1px solid rgba(82,121,111,0.13); }
+.fert-card h4 { font-family:'Playfair Display',serif; color:var(--forest); font-size:1rem; margin-bottom:0.5rem; }
+.fert-ratio { display:inline-block; background:var(--forest); color:#fff; font-size:0.72rem; font-weight:700; padding:0.25rem 0.65rem; border-radius:3px; margin-bottom:0.7rem; }
+.fert-card p { font-size:0.82rem; color:var(--mid); font-weight:300; line-height:1.6; }
+.npk-table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 20px rgba(27,67,50,0.06); }
+.npk-table th { background:var(--forest); color:#fff; text-align:left; padding:0.85rem 1rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; }
+.npk-table td { padding:0.85rem 1rem; font-size:0.83rem; border-bottom:1px solid rgba(82,121,111,0.1); color:#444; font-weight:300; }
+.npk-table tr:last-child td { border-bottom:none; }
+.npk-table strong { color:var(--forest); font-weight:700; }
+.table-wrap { overflow-x:auto; }
+
+footer { background:var(--charcoal); color:rgba(255,255,255,0.45); padding:60px 6% 40px; }
+.footer-inner { max-width:1140px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr; gap:3rem; margin-bottom:3rem; }
+.footer-brand-name { font-family:'Playfair Display',serif; font-weight:700; color:#fff; font-size:1.3rem; margin-bottom:0.75rem; }
+.footer-brand-name span { color:var(--gold); }
+.footer-tagline { font-size:0.85rem; line-height:1.7; max-width:280px; margin-bottom:1.25rem; }
+.footer-social { display:flex; gap:0.75rem; }
+.social-btn { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:0.85rem; text-decoration:none; }
+.social-btn:hover { background:var(--gold); }
+.footer-col h4 { color:#fff; font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1rem; }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
+.footer-col ul a { color:rgba(255,255,255,0.45); text-decoration:none; font-size:0.85rem; }
+.footer-col ul a:hover { color:var(--gold); }
+.footer-bottom { border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.8rem; max-width:1140px; margin:0 auto; }
+.footer-bottom a { color:rgba(255,255,255,0.45); text-decoration:none; }
+
+#waFloat { position:fixed; bottom:1.5rem; right:1.5rem; z-index:150; width:54px; height:54px; border-radius:50%; background:#25D366; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-shadow:0 6px 20px rgba(37,211,102,0.5); }
+#chatToggle { position:fixed; bottom:5.5rem; right:1.5rem; z-index:160; width:58px; height:58px; border-radius:50%; background:var(--forest); color:#fff; border:none; cursor:pointer; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(27,67,50,0.45); }
+#chatToggle .chat-dot { position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%; background:var(--gold); border:2px solid var(--cream); }
+#chatPanel { position:fixed; bottom:5.5rem; right:1.5rem; z-index:250; width:340px; max-width:90vw; height:480px; max-height:70vh; background:#fff; border-radius:14px; box-shadow:0 24px 64px rgba(0,0,0,0.3); display:flex; flex-direction:column; overflow:hidden; transform:translateY(16px) scale(0.97); opacity:0; pointer-events:none; transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+#chatPanel.open { transform:translateY(0) scale(1); opacity:1; pointer-events:all; }
+.chat-header { background:var(--forest); color:#fff; padding:1rem 1.25rem; display:flex; align-items:center; gap:0.75rem; flex-shrink:0; }
+.chat-avatar { width:36px; height:36px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+.chat-header-text { flex:1; }
+.chat-header-text strong { display:block; font-size:0.88rem; font-family:'Playfair Display',serif; }
+.chat-header-text span { font-size:0.7rem; color:rgba(255,255,255,0.55); display:flex; align-items:center; gap:0.3rem; }
+.chat-header-text span::before { content:''; width:6px; height:6px; border-radius:50%; background:#4ADE80; display:inline-block; }
+.chat-close { background:rgba(255,255,255,0.12); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.9rem; }
+.chat-body { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.6rem; background:var(--cream); }
+.chat-msg { max-width:85%; padding:0.6rem 0.85rem; border-radius:12px; font-size:0.83rem; line-height:1.5; white-space:pre-line; }
+.chat-msg.bot { background:#fff; color:var(--charcoal); align-self:flex-start; border-bottom-left-radius:3px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.chat-msg.user { background:var(--forest); color:#fff; align-self:flex-end; border-bottom-right-radius:3px; }
+.chat-quick { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.2rem; }
+.chat-chip { background:#fff; border:1.5px solid var(--sage-light); color:var(--forest); font-size:0.74rem; font-weight:600; padding:0.4rem 0.7rem; border-radius:20px; cursor:pointer; }
+.chat-chip:hover { background:var(--forest); color:#fff; }
+.chat-typing { display:flex; gap:4px; padding:0.7rem 0.9rem; background:#fff; border-radius:12px; align-self:flex-start; width:fit-content; }
+.chat-typing span { width:6px; height:6px; border-radius:50%; background:var(--sage); animation:typingBounce 1.2s infinite; }
+.chat-typing span:nth-child(2) { animation-delay:0.2s; }
+.chat-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:0.5} 30%{transform:translateY(-4px);opacity:1} }
+.chat-input-row { display:flex; gap:0.5rem; padding:0.75rem; border-top:1px solid rgba(82,121,111,0.15); background:#fff; flex-shrink:0; }
+.chat-input-row input { flex:1; border:1.5px solid rgba(82,121,111,0.25); border-radius:20px; padding:0.55rem 1rem; font-size:0.83rem; font-family:'Inter',sans-serif; outline:none; }
+.chat-input-row button { background:var(--forest); color:#fff; border:none; width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:0.95rem; flex-shrink:0; }
+
+@media(max-width:900px){
+  nav .nav-links { display:none; }
+  .hamburger { display:flex; }
+  .footer-inner { grid-template-columns:1fr; gap:2rem; }
+  .checker { padding:1.5rem; }
+}
+@media(max-width:480px){
+  #chatPanel { right:0.75rem; left:0.75rem; width:auto; }
+}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-brand">Dr.<span>GreenFix</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="plant-doctor.html" class="active">Plant Doctor</a></li>
+    <li><a href="index.html#gallery">Gallery</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#faq">FAQ</a></li>
+    <li><a href="index.html?book=1" class="nav-cta">Book Now</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html#services">Services</a>
+  <a href="blog.html">📝 Blog</a>
+  <a href="index.html#gallery">Gallery</a>
+  <a href="index.html#about">About</a>
+  <a href="index.html#faq">FAQ</a>
+  <a href="index.html?book=1" class="mob-cta">📅 Book Now</a>
+</div>
+
+<section class="page-hero">
+  <div class="page-eyebrow">🔬 Free Tool</div>
+  <h1 class="page-title">Plant Doctor</h1>
+  <p class="page-sub">Tick the symptoms you're seeing and get an instant shortlist of likely causes — plus a full pest, disease & fertiliser reference library below.</p>
+</section>
+
+<!-- SYMPTOM CHECKER -->
+<section class="section" id="checker">
+  <div class="section-header">
+    <div class="eyebrow">Symptom Checker</div>
+    <h2 class="section-title">What's your plant telling you?</h2>
+    <p class="section-desc">Select everything you're noticing — the more you select, the more accurate the match. This is a guide, not a certain diagnosis; for a definite answer, send us photos.</p>
+  </div>
+  <div class="checker">
+    <div class="checker-step-label">SELECT ALL SYMPTOMS YOU SEE</div>
+    <div class="symptom-grid" id="symptomGrid"></div>
+    <button class="btn-diagnose" id="btnDiagnose" onclick="runDiagnosis()" disabled>Diagnose →</button>
+    <div class="diag-results" id="diagResults"></div>
+  </div>
+</section>
+
+<!-- LIBRARY -->
+<section class="section" id="library" style="background:var(--cream-dark);max-width:100%;">
+  <div style="max-width:1140px;margin:0 auto;">
+    <div class="section-header">
+      <div class="eyebrow">Reference Library</div>
+      <h2 class="section-title">Common pests & diseases</h2>
+      <p class="section-desc">Browse by type, or use the symptom checker above for a personalised shortlist.</p>
+    </div>
+    <div class="lib-filter">
+      <button class="filter-chip active" onclick="filterLib('all',this)">All</button>
+      <button class="filter-chip" onclick="filterLib('pest',this)">Pests</button>
+      <button class="filter-chip" onclick="filterLib('disease',this)">Diseases</button>
+    </div>
+    <div class="lib-grid" id="libGrid"></div>
+  </div>
+</section>
+
+<!-- FERTILISER GUIDE -->
+<section class="section" id="fertiliser">
+  <div class="section-header">
+    <div class="eyebrow">Fertiliser Notes</div>
+    <h2 class="section-title">A feeding guide that actually makes sense</h2>
+    <p class="section-desc">N-P-K ratios and feeding frequency by plant type, plus how to spot a nutrient deficiency.</p>
+  </div>
+  <div class="fert-grid">
+    <div class="fert-card"><span class="fert-ratio">N 12 – P 4 – K 8</span><h4>🥬 Leafy vegetables & lawns</h4><p>High nitrogen drives leafy green growth. Feed every 4–6 weeks through the growing season.</p></div>
+    <div class="fert-card"><span class="fert-ratio">N 5 – P 10 – K 10</span><h4>🌹 Flowering & fruiting (roses, tomatoes)</h4><p>Higher phosphorus & potassium supports flowers and fruit. Feed every 3–4 weeks in season.</p></div>
+    <div class="fert-card"><span class="fert-ratio">N 10 – P 10 – K 10 (½ strength)</span><h4>🪴 Indoor houseplants</h4><p>Balanced, diluted liquid feed monthly in spring/summer. Stop feeding entirely over winter.</p></div>
+    <div class="fert-card"><span class="fert-ratio">Low-phosphorus blend</span><h4>🌿 Australian natives</h4><p>Many natives are phosphorus-sensitive — use a dedicated low-P native fertiliser, applied lightly in spring and autumn.</p></div>
+    <div class="fert-card"><span class="fert-ratio">N 8 – P 3 – K 9 + Mg</span><h4>🍋 Citrus trees</h4><p>Feed in early spring, late spring and autumn. Added magnesium prevents the yellowing common in potted citrus.</p></div>
+    <div class="fert-card"><span class="fert-ratio">Compost + slow-release</span><h4>🌻 General garden beds</h4><p>A balanced slow-release granular feed at planting, topped up with compost twice a year, suits most mixed beds.</p></div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="npk-table">
+      <tr><th>Deficiency</th><th>What you'll see</th><th>Quick fix</th></tr>
+      <tr><td><strong>Nitrogen (N)</strong></td><td>Uniform pale yellowing, starting on older/lower leaves; stunted growth</td><td>Higher-N feed or blood & bone</td></tr>
+      <tr><td><strong>Phosphorus (P)</strong></td><td>Dull, dark-green or purplish leaves; weak root development; few flowers</td><td>Higher-P feed at planting time</td></tr>
+      <tr><td><strong>Potassium (K)</strong></td><td>Browning/scorched leaf edges; weak stems; poor fruit quality</td><td>Higher-K feed, especially before fruiting</td></tr>
+      <tr><td><strong>Iron (Fe)</strong></td><td>Yellowing between leaf veins on <em>new</em> growth, veins stay green</td><td>Chelated iron feed; check soil pH isn't too high</td></tr>
+      <tr><td><strong>Magnesium (Mg)</strong></td><td>Yellowing between veins on <em>older</em> leaves, veins stay green</td><td>Epsom salts (magnesium sulphate) soil drench</td></tr>
+      <tr><td><strong>Calcium (Ca)</strong></td><td>Blossom end rot on tomatoes/capsicums; distorted new growth</td><td>Consistent watering + gypsum or lime</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">Dr.<span>GreenFix</span></div>
+      <p class="footer-tagline">Melbourne-based garden consulting, available online worldwide. Sick plants, layout advice, video consults, planting & maintenance — we fix it.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" title="Instagram">📸</a>
+        <a href="#" class="social-btn" title="Facebook">📘</a>
+        <a href="#" class="social-btn" title="TikTok">🎵</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="index.html?book=1">Photo Diagnosis — $20</a></li>
+        <li><a href="index.html?book=1">Video Consult — $40</a></li>
+        <li><a href="index.html?book=1">Garden Visit Plan — $60+</a></li>
+        <li><a href="index.html?book=1">Planting & Installation</a></li>
+        <li><a href="index.html?book=1">Garden Maintenance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#about">About Dr. GreenFix</a></li>
+        <li><a href="blog.html">📝 Garden Blog</a></li>
+        <li><a href="index.html#gallery">Gallery</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+        <li><a href="mailto:hello@drgreenfix.com.au">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Dr. GreenFix Garden Consulting · Melbourne, Australia</div>
+    <div><a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a></div>
+  </div>
+</footer>
+
+<a href="https://wa.me/61400000000" id="waFloat" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
+<button id="chatToggle" onclick="toggleChat()" title="Chat with GreenBot">🌿<span class="chat-dot"></span></button>
+<div id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-header-text"><strong>GreenBot</strong><span>Online — usually replies instantly</span></div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask about pests, pricing, booking…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){document.getElementById('hamburger').classList.toggle('open');document.getElementById('mobileMenu').classList.toggle('open');}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mobileMenu'), burger = document.getElementById('hamburger');
+  if (menu.classList.contains('open') && !menu.contains(e.target) && !burger.contains(e.target)) { menu.classList.remove('open'); burger.classList.remove('open'); }
+});
+
+// ══════════════════════════════════
+// SYMPTOM CHECKER
+// ══════════════════════════════════
+const symptomOptions = [
+  {id:'yellow', label:'🟡 Yellow leaves'},
+  {id:'brownedge', label:'🍂 Brown, crispy leaf edges'},
+  {id:'wilting', label:'😵 Wilting despite watering'},
+  {id:'mushy', label:'🫧 Mushy stem or roots'},
+  {id:'powdery', label:'⚪ White powdery coating'},
+  {id:'sooty', label:'⚫ Black sooty coating'},
+  {id:'holes', label:'🕳️ Holes chewed in leaves'},
+  {id:'spots', label:'🔴 Dark spots on leaves'},
+  {id:'sticky', label:'🍯 Sticky residue on leaves'},
+  {id:'webbing', label:'🕸️ Fine webbing'},
+  {id:'insects', label:'🐛 Visible small insects'},
+  {id:'curling', label:'🌀 Leaves curling'},
+  {id:'stunted', label:'📉 Stunted growth'},
+  {id:'cottony', label:'☁️ White cottony spots'},
+];
+const conditions = [
+  { name:'Overwatering / Root Rot', cat:'disease', symptoms:['yellow','wilting','mushy'], cause:'Roots sitting in waterlogged soil can\'t breathe, causing rot and yellow, wilting leaves even though the soil is wet.', fix:'Let soil dry out fully before watering again, improve drainage, and trim any mushy roots if repotting.' },
+  { name:'Underwatering', cat:'disease', symptoms:['brownedge','wilting'], cause:'Insufficient water reaching the roots causes crispy leaf edges and wilting, usually with light, dry soil.', fix:'Water deeply and consistently; check soil moisture 5cm down before assuming it needs more.' },
+  { name:'Powdery Mildew', cat:'disease', symptoms:['powdery','curling','stunted'], cause:'A fungal disease that thrives in humid conditions with poor airflow.', fix:'Improve airflow, avoid overhead watering, and treat with a sulphur or potassium bicarbonate fungicide.' },
+  { name:'Sooty Mould', cat:'disease', symptoms:['sooty','sticky','insects'], cause:'A black fungus growing on the sugary honeydew left behind by sap-sucking insects like aphids or scale.', fix:'Treat the underlying pest first (aphids/scale), then wipe leaves clean with diluted soapy water.' },
+  { name:'Aphid Infestation', cat:'pest', symptoms:['sticky','insects','curling','stunted'], cause:'Small sap-sucking insects clustering on new growth and buds.', fix:'Blast with water every few days, or use an insecticidal soap spray for larger infestations.' },
+  { name:'Spider Mites', cat:'pest', symptoms:['webbing','stunted','yellow'], cause:'Tiny mites that thrive in hot, dry conditions and feed on leaf sap.', fix:'Increase humidity, hose down foliage, and use a miticide if the infestation is severe.' },
+  { name:'Scale Insects', cat:'pest', symptoms:['sticky','insects','stunted'], cause:'Small, immobile bumps on stems that feed on sap and secrete honeydew.', fix:'Scrape off with a soft brush, then treat with horticultural oil.' },
+  { name:'Mealybugs', cat:'pest', symptoms:['cottony','sticky','stunted'], cause:'Soft-bodied insects that cover themselves in a white, waxy, cotton-like coating.', fix:'Dab individual bugs with alcohol-dipped cotton buds, then treat with insecticidal soap.' },
+  { name:'Caterpillars / Chewing Pests', cat:'pest', symptoms:['holes'], cause:'Caterpillars or beetles physically chewing through leaf tissue, often leaving small dark droppings.', fix:'Hand-remove where possible; netting prevents egg-laying moths reaching susceptible plants like brassicas.' },
+  { name:'Fungal Leaf Spot', cat:'disease', symptoms:['spots','yellow'], cause:'A range of fungal or bacterial pathogens causing distinct dark spots, often with a yellow halo.', fix:'Remove affected leaves, avoid wetting foliage when watering, and treat with a copper-based fungicide if it spreads.' },
+  { name:'Nitrogen Deficiency', cat:'disease', symptoms:['yellow','stunted'], cause:'Uniform pale yellowing starting on older leaves as the plant redirects nitrogen to new growth.', fix:'Apply a higher-nitrogen fertiliser during the growing season.' },
+];
+let selectedSymptoms = new Set();
+function buildSymptomGrid(){
+  const grid = document.getElementById('symptomGrid');
+  symptomOptions.forEach(s => {
+    const label = document.createElement('label');
+    label.className = 'symptom-opt';
+    label.id = 'opt-'+s.id;
+    label.innerHTML = `<input type="checkbox" value="${s.id}"> ${s.label}`;
+    label.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) selectedSymptoms.add(s.id); else selectedSymptoms.delete(s.id);
+      label.classList.toggle('checked', e.target.checked);
+      document.getElementById('btnDiagnose').disabled = selectedSymptoms.size === 0;
+    });
+    grid.appendChild(label);
+  });
+}
+buildSymptomGrid();
+
+function runDiagnosis(){
+  const results = conditions.map(c => {
+    const overlap = c.symptoms.filter(s => selectedSymptoms.has(s)).length;
+    const score = overlap / c.symptoms.length;
+    return {...c, overlap, score};
+  }).filter(c => c.overlap > 0).sort((a,b) => b.overlap - a.overlap || b.score - a.score).slice(0,4);
+
+  const box = document.getElementById('diagResults');
+  box.classList.add('show');
+  if (!results.length) {
+    box.innerHTML = '<p class="diag-empty">No close matches found — your combination of symptoms is unusual. A Photo Diagnosis will get you a definite answer.</p>';
+  } else {
+    box.innerHTML = results.map(r => `
+      <div class="diag-card">
+        <div class="diag-match">${Math.round(r.score*100)}% symptom match · ${r.cat === 'pest' ? '🐛 Pest' : '🦠 Disease/Deficiency'}</div>
+        <h4>${r.name}</h4>
+        <p><strong>Likely cause:</strong> ${r.cause}</p>
+        <p><strong>What to do:</strong> ${r.fix}</p>
+      </div>
+    `).join('');
+  }
+  box.innerHTML += `<div class="diag-cta"><p>This checker narrows things down — for a certain diagnosis and a tailored treatment plan, send us photos.</p><button class="btn-diagnose" style="background:var(--gold);color:var(--forest);" onclick="location.href='index.html?book=1'">Book a Photo Diagnosis — $20 →</button></div>`;
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ══════════════════════════════════
+// LIBRARY
+// ══════════════════════════════════
+const libItems = [
+  {name:'Aphids', cat:'pest', img:'greenfix-aphid', desc:'Small, pear-shaped insects clustering on new growth and buds, often leaving a sticky residue.'},
+  {name:'Snails & Slugs', cat:'pest', img:'greenfix-snail', desc:'Irregular holes in leaves and a silvery slime trail, worst after rain.'},
+  {name:'Caterpillars', cat:'pest', img:'greenfix-caterpillar', desc:'Ragged chewed holes and small dark droppings on and around leaves.'},
+  {name:'Scale Insects', cat:'pest', img:'greenfix-scale', desc:'Small, immobile bumps along stems that don\'t brush off easily.'},
+  {name:'Spider Mites', cat:'pest', img:'greenfix-mites', desc:'Fine webbing and tiny speckled dots on leaves, worse in hot, dry weather.'},
+  {name:'Mealybugs', cat:'pest', img:'greenfix-mealybug', desc:'Soft insects covered in a white, cottony wax, usually in leaf joints.'},
+  {name:'Powdery Mildew', cat:'disease', img:'greenfix-mildew', desc:'A white, powdery fungal coating on leaves and stems in humid, still conditions.'},
+  {name:'Sooty Mould', cat:'disease', img:'greenfix-sooty', desc:'Black fungal growth on the honeydew left by sap-sucking pests.'},
+  {name:'Root Rot', cat:'disease', img:'greenfix-rootrot', desc:'Mushy, dark roots and yellowing leaves caused by prolonged waterlogged soil.'},
+  {name:'Fungal Leaf Spot', cat:'disease', img:'greenfix-leafspot', desc:'Distinct dark spots, often with a yellow halo, from fungal or bacterial pathogens.'},
+];
+function renderLib(filter){
+  const grid = document.getElementById('libGrid');
+  grid.innerHTML = libItems.filter(i => filter==='all' || i.cat===filter).map(i => `
+    <div class="lib-card">
+      <img src="https://picsum.photos/seed/${i.img}/500/320" alt="${i.name}" loading="lazy">
+      <div class="lib-card-body">
+        <span class="lib-cat ${i.cat}">${i.cat==='pest'?'🐛 Pest':'🦠 Disease'}</span>
+        <h4>${i.name}</h4>
+        <p>${i.desc}</p>
+      </div>
+    </div>
+  `).join('');
+}
+function filterLib(cat, btn){
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderLib(cat);
+}
+renderLib('all');
+
+// GreenBot (shared logic)
+let chatOpened = false;
+let chatNotes = JSON.parse(localStorage.getItem('gf_chat_notes') || '[]');
+const AI_CHAT_ENDPOINT = 'PASTE_YOUR_BACKEND_URL_HERE';
+let aiChatHistory = [];
+async function getBotReply(text) {
+  const backendConfigured = AI_CHAT_ENDPOINT && !AI_CHAT_ENDPOINT.includes('PASTE_YOUR_BACKEND_URL_HERE');
+  if (backendConfigured) {
+    try {
+      const res = await fetch(AI_CHAT_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message:text, history:aiChatHistory }) });
+      if (!res.ok) throw new Error('backend status ' + res.status);
+      const data = await res.json();
+      if (!data.reply) throw new Error('no reply field');
+      aiChatHistory.push({role:'user',content:text},{role:'assistant',content:data.reply});
+      if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+      return data.reply;
+    } catch (err) { console.warn('GreenBot AI backend unavailable, using fallback:', err); }
+  }
+  return botFind(text) || "Noted! Try the symptom checker above, or want to jump into booking?";
+}
+const botKB = [
+  { k:['hi','hello','hey'], r:"Hey! 👋 I'm GreenBot. Try the symptom checker above, or ask me about pests, fertiliser, or pricing." },
+  { k:['price','cost','how much','pricing'], r:"📸 Photo Diagnosis $20–30 · 📹 Video Consult $40–60 · 🏡 Garden Visit $60+ · 🌱 Planting free quote · ✂️ Maintenance from $45/visit." },
+  { k:['pest','bug','insect','aphid','snail','caterpillar'], r:"Scroll up and try the symptom checker — tick what you see and I'll shortlist the likely pest." },
+  { k:['disease','fungus','mould','mold','spots','yellow','wilt'], r:"The symptom checker above covers common diseases too — or book a Photo Diagnosis for a certain answer." },
+  { k:['fertiliser','fertilizer','feed','nutrient','npk'], r:"Check the Fertiliser Notes section on this page for N-P-K ratios and a deficiency table." },
+  { k:['book','appointment','schedule'], r:"Got it — tap below and I'll take your notes straight to the booking form." },
+  { k:['thank'], r:"You're welcome! 🌿" },
+];
+function botFind(msg){const m=msg.toLowerCase();for(const e of botKB) if(e.k.some(k=>m.includes(k))) return e.r; return null;}
+function chatBubble(sender,text){const body=document.getElementById('chatBody');const div=document.createElement('div');div.className='chat-msg '+sender;div.textContent=text;body.appendChild(div);body.scrollTop=body.scrollHeight;}
+function chatQuickReplies(options){const body=document.getElementById('chatBody');const wrap=document.createElement('div');wrap.className='chat-quick';options.forEach(o=>{const c=document.createElement('button');c.className='chat-chip';c.textContent=o.label;c.onclick=o.action;wrap.appendChild(c);});body.appendChild(wrap);body.scrollTop=body.scrollHeight;}
+function chatTyping(show){let el=document.getElementById('chatTypingDots');if(show){if(el)return;const body=document.getElementById('chatBody');el=document.createElement('div');el.className='chat-typing';el.id='chatTypingDots';el.innerHTML='<span></span><span></span><span></span>';body.appendChild(el);body.scrollTop=body.scrollHeight;}else if(el)el.remove();}
+function saveChatNote(t){chatNotes.push(t);localStorage.setItem('gf_chat_notes',JSON.stringify(chatNotes));}
+function initChat(){if(chatOpened)return;chatOpened=true;chatBubble('bot',"Hi! I'm GreenBot 🌿 — try the symptom checker above, or ask me anything.");chatQuickReplies([
+  {label:'📅 Book an appointment',action:()=>userSend('I want to book an appointment')},
+  {label:'💰 Pricing',action:()=>userSend('how much does it cost')},
+]);}
+function userSend(text){if(!text.trim())return;chatBubble('user',text);saveChatNote(text);document.getElementById('chatInput').value='';chatTyping(true);getBotReply(text).then(reply=>{chatTyping(false);chatBubble('bot',reply);if(/book|appointment|schedule/i.test(text)){chatQuickReplies([{label:'📋 Open booking form →',action:()=>{location.href='index.html?book=1';}}]);}});}
+function sendChat(){userSend(document.getElementById('chatInput').value);}
+function toggleChat(){const p=document.getElementById('chatPanel');p.classList.toggle('open');if(p.classList.contains('open')){initChat();document.getElementById('chatInput').focus();}}
+</script>
+</body>
+</html>
