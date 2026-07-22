@@ -425,23 +425,6 @@ document.addEventListener('click', e => {
 // GreenBot (shared logic — see index.html for full documentation)
 let chatOpened = false;
 let chatNotes = JSON.parse(localStorage.getItem('gf_chat_notes') || '[]');
-const AI_CHAT_ENDPOINT = 'PASTE_YOUR_BACKEND_URL_HERE';
-let aiChatHistory = [];
-async function getBotReply(text) {
-  const backendConfigured = AI_CHAT_ENDPOINT && !AI_CHAT_ENDPOINT.includes('PASTE_YOUR_BACKEND_URL_HERE');
-  if (backendConfigured) {
-    try {
-      const res = await fetch(AI_CHAT_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message:text, history:aiChatHistory }) });
-      if (!res.ok) throw new Error('backend status ' + res.status);
-      const data = await res.json();
-      if (!data.reply) throw new Error('no reply field');
-      aiChatHistory.push({role:'user',content:text},{role:'assistant',content:data.reply});
-      if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
-      return data.reply;
-    } catch (err) { console.warn('GreenBot AI backend unavailable, using fallback:', err); }
-  }
-  return botFind(text) || "Noted! Want to jump into booking, or try the Plant Doctor tool for a symptom check?";
-}
 const botKB = [
   { k:['hi','hello','hey'], r:"Hey! 👋 I'm GreenBot. Ask me about pests, fertiliser, pricing, or say 'book' and I'll take you straight to booking with your notes carried across." },
   { k:['price','cost','how much','pricing'], r:"📸 Photo Diagnosis $20–30 · 📹 Video Consult $40–60 · 🏡 Garden Visit $60+ · 🌱 Planting free quote · ✂️ Maintenance from $45/visit." },
@@ -461,7 +444,7 @@ function initChat(){if(chatOpened)return;chatOpened=true;chatBubble('bot',"Hi! I
   {label:'🐛 Pest or disease?',action:()=>userSend('pest or disease problem')},
   {label:'💰 Pricing',action:()=>userSend('how much does it cost')},
 ]);}
-function userSend(text){if(!text.trim())return;chatBubble('user',text);saveChatNote(text);document.getElementById('chatInput').value='';chatTyping(true);getBotReply(text).then(reply=>{chatTyping(false);chatBubble('bot',reply);if(/book|appointment|schedule/i.test(text)){chatQuickReplies([{label:'📋 Open booking form →',action:()=>{location.href='index.html?book=1';}}]);}});}
+function userSend(text){if(!text.trim())return;chatBubble('user',text);saveChatNote(text);document.getElementById('chatInput').value='';chatTyping(true);setTimeout(()=>{chatTyping(false);const reply=botFind(text)||"Noted! Want to jump into booking, or try the Plant Doctor tool for a symptom check?";chatBubble('bot',reply);if(/book|appointment|schedule/i.test(text)){chatQuickReplies([{label:'📋 Open booking form →',action:()=>{location.href='index.html?book=1';}}]);}},600+Math.random()*400);}
 function sendChat(){userSend(document.getElementById('chatInput').value);}
 function toggleChat(){const p=document.getElementById('chatPanel');p.classList.toggle('open');if(p.classList.contains('open')){initChat();document.getElementById('chatInput').focus();}}
 </script>
